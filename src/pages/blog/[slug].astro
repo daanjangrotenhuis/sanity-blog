@@ -5,22 +5,20 @@ import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { sanityClient } from 'sanity:client';
 
-export async function getStaticPaths() {
-    const posts = await sanityClient.fetch(`
-        *[_type == "post"] {
-            slug,
-            title,
-            publishedAt,
-            body
-        }
-    `);
-    return posts.map((post: any) => ({
-        params: { slug: post.slug.current },
-        props: { post },
-    }));
-}
+const { slug } = Astro.params;
 
-const { post } = Astro.props;
+const post = await sanityClient.fetch(`
+    *[_type == "post" && slug.current == $slug][0] {
+        title,
+        slug,
+        publishedAt,
+        body
+    }
+`, { slug });
+
+if (!post) {
+    return Astro.redirect('/');
+}
 
 function formatDate(dateStr: string) {
     if (!dateStr) return '';
