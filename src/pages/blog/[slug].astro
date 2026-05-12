@@ -1,0 +1,67 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { sanityClient } from 'sanity:client';
+
+export async function getStaticPaths() {
+    const posts = await sanityClient.fetch(`
+        *[_type == "post"] {
+            slug,
+            title,
+            publishedAt,
+            body
+        }
+    `);
+    return posts.map((post: any) => ({
+        params: { slug: post.slug.current },
+        props: { post },
+    }));
+}
+
+const { post } = Astro.props;
+
+function formatDate(dateStr: string) {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+---
+
+<!doctype html>
+<html lang="nl">
+    <head>
+        <BaseHead title={`${post.title} — ${SITE_TITLE}`} description={post.body?.slice(0, 160) ?? ''} />
+    </head>
+    <body>
+        <Header />
+
+        <main style="max-width: 720px; margin: 0 auto; padding: 3rem 1.5rem;">
+
+            <a href="/" style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: var(--muted); margin-bottom: 2.5rem;">
+                ← Terug naar overzicht
+            </a>
+
+            <article>
+                <p style="font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--terracotta); margin-bottom: 1rem;">
+                    {formatDate(post.publishedAt)}
+                </p>
+
+                <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; line-height: 1.2; color: var(--warm-dark); margin-bottom: 2rem;">
+                    {post.title}
+                </h1>
+
+                <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 2.5rem;" />
+
+                <div style="font-size: 1.1rem; line-height: 1.85; color: var(--warm-dark);">
+                    {post.body?.split('\n\n').map((paragraph: string) => (
+                        <p style="margin-bottom: 1.5em;">{paragraph}</p>
+                    ))}
+                </div>
+            </article>
+
+        </main>
+
+        <Footer />
+    </body>
+</html>
