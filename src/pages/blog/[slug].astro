@@ -51,11 +51,7 @@ function formatDate(dateStr: string) {
 
                 <hr style="border: none; border-top: 1px solid var(--border); margin-bottom: 2.5rem;" />
 
-                <div style="font-size: 1.1rem; line-height: 1.85; color: var(--warm-dark);">
-                    {post.body?.split('\n\n').map((paragraph: string) => (
-                        <p style="margin-bottom: 1.5em;">{paragraph}</p>
-                    ))}
-                </div>
+                <div set:html={post.body} style="font-size: 1.1rem; line-height: 1.85; color: var(--warm-dark);" />
             </article>
 
         </main>
