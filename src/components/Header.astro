@@ -1,18 +1,26 @@
 ---
-import { SITE_TITLE } from '../consts';
+const currentPath = Astro.url.pathname;
 ---
 
-<header style="background: var(--cream); border-bottom: 1px solid var(--border);">
-    <div style="max-width: 1100px; margin: 0 auto; padding: 0 1.5rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 0;">
-            <a href="/" style="font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--warm-dark); letter-spacing: -0.02em;">
-                {SITE_TITLE}
-            </a>
-            <nav style="display: flex; gap: 2rem;">
-                <a href="/" style="font-size: 0.9rem; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;" onmouseover="this.style.color='var(--warm-dark)'" onmouseout="this.style.color='var(--muted)'">Home</a>
-                <a href="/blog" style="font-size: 0.9rem; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;" onmouseover="this.style.color='var(--warm-dark)'" onmouseout="this.style.color='var(--muted)'">Reizen</a>
-                <a href="/about" style="font-size: 0.9rem; font-weight: 500; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; transition: color 0.2s;" onmouseover="this.style.color='var(--warm-dark)'" onmouseout="this.style.color='var(--muted)'">Over ons</a>
-            </nav>
-        </div>
+<header style="background: var(--white); border-bottom: 1px solid var(--border);">
+    <div style="max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 64px;">
+
+        <a href="/" style="font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--dark); letter-spacing: -0.01em;">
+            Vakantie voor Kids
+        </a>
+
+        <nav style="display: flex; align-items: center; gap: 2rem;">
+            {[['/', 'Home'], ['/blog', 'Artikelen'], ['/about', 'Over ons']].map(([href, label]) => (
+                <a
+                    href={href}
+                    style={`font-size: 0.9rem; font-weight: 500; transition: color 0.15s; ${currentPath === href ? 'color: var(--accent);' : 'color: var(--muted);'}`}
+                    onmouseover="this.style.color='var(--dark)'"
+                    onmouseout={`this.style.color='${currentPath === href ? 'var(--accent)' : 'var(--muted)'}'`}
+                >
+                    {label}
+                </a>
+            ))}
+        </nav>
+
     </div>
 </header>

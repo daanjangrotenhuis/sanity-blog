@@ -1,27 +1,28 @@
 ---
-import { SITE_TITLE } from '../consts';
 const today = new Date();
 ---
 
-<footer style="background: var(--warm-dark); color: #BFB4AA; margin-top: 5rem;">
-    <div style="max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem;">
-        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 2rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <div>
-                <div style="font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 0.5rem;">
-                    {SITE_TITLE}
-                </div>
-                <p style="font-size: 0.95rem; max-width: 280px; line-height: 1.6; margin: 0;">
-                    Reisverhalen, tips en inspiratie voor je volgende avontuur.
-                </p>
+<footer style="border-top: 1px solid var(--border); margin-top: 6rem; padding: 3rem 1.5rem;">
+    <div style="max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+
+        <div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem;">
+                Vakantie voor Kids
             </div>
-            <nav style="display: flex; flex-direction: column; gap: 0.75rem;">
-                <a href="/" style="font-size: 0.9rem; color: #BFB4AA; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#BFB4AA'">Home</a>
-                <a href="/blog" style="font-size: 0.9rem; color: #BFB4AA; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#BFB4AA'">Reizen</a>
-                <a href="/about" style="font-size: 0.9rem; color: #BFB4AA; transition: color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#BFB4AA'">Over ons</a>
-            </nav>
+            <p style="font-size: 0.85rem; color: var(--muted); margin: 0;">
+                Reistips en inspiratie voor gezinnen.
+            </p>
         </div>
-        <div style="padding-top: 1.5rem; font-size: 0.85rem;">
-            &copy; {today.getFullYear()} {SITE_TITLE}. Alle rechten voorbehouden.
-        </div>
+
+        <nav style="display: flex; gap: 2rem;">
+            {[['/', 'Home'], ['/blog', 'Artikelen'], ['/about', 'Over ons']].map(([href, label]) => (
+                <a href={href} style="font-size: 0.875rem; color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">{label}</a>
+            ))}
+        </nav>
+
+        <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">
+            &copy; {today.getFullYear()} vakantievoorkids.nl
+        </p>
+
     </div>
 </footer>

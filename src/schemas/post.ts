@@ -26,5 +26,10 @@ export default defineType({
             title: 'Body',
             type: 'text',
         }),
+        defineField({
+            name: 'imageUrl',
+            title: 'Afbeelding URL',
+            type: 'url',
+        }),
     ],
 })

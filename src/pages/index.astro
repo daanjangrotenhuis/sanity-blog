@@ -7,10 +7,7 @@ import { sanityClient } from 'sanity:client';
 
 const posts = await sanityClient.fetch(`
   *[_type == "post"] | order(publishedAt desc) {
-    title,
-    slug,
-    publishedAt,
-    body
+    title, slug, publishedAt, body
   }
 `);
 
@@ -22,93 +19,97 @@ function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function excerpt(body: string, length = 140) {
+function excerpt(body: string, length = 130) {
     if (!body) return '';
-    return body.length > length ? body.slice(0, length).trimEnd() + '…' : body;
+    const plain = body.replace(/<[^>]+>/g, '');
+    return plain.length > length ? plain.slice(0, length).trimEnd() + '…' : plain;
 }
-
-const gradients = [
-    'linear-gradient(135deg, #C4622D 0%, #8C3A1A 100%)',
-    'linear-gradient(135deg, #4A7C59 0%, #2D5A3C 100%)',
-    'linear-gradient(135deg, #5B7FA6 0%, #2C4F73 100%)',
-    'linear-gradient(135deg, #9B6B47 0%, #6B4226 100%)',
-    'linear-gradient(135deg, #7B6B8A 0%, #4A3D5C 100%)',
-];
 ---
 
 <!doctype html>
 <html lang="nl">
-    <head>
-        <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    </head>
-    <body>
-        <Header />
+<head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+</head>
+<body>
+    <Header />
 
-        <main style="max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem;">
+    <main style="max-width: 1100px; margin: 0 auto; padding: 4rem 1.5rem;">
 
-            {featured && (
-                <section style="margin-bottom: 4rem;">
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                        <span style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terracotta);">Uitgelicht verhaal</span>
-                        <div style="flex: 1; height: 1px; background: var(--border);"></div>
+        <!-- INTRO -->
+        <div style="max-width: 560px; margin-bottom: 4rem;">
+            <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 700; color: var(--dark); line-height: 1.2; margin-bottom: 1rem;">
+                Vakanties die kinderen nooit vergeten
+            </h1>
+            <p style="font-size: 1.05rem; color: var(--muted); line-height: 1.75; margin: 0;">
+                Eerlijke verhalen, praktische tips en de mooiste bestemmingen voor gezinnen met kinderen. Geen reclame, gewoon goede reistips.
+            </p>
+        </div>
+
+        <!-- FEATURED POST -->
+        {featured && (
+            <section style="margin-bottom: 4.5rem;">
+                <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem;">
+                    Nieuwste artikel
+                </p>
+                <a href={`/blog/${featured.slug?.current}`} style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--white); transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)'" onmouseout="this.style.boxShadow='none'">
+                    <div style="background: #E8E0D8; min-height: 280px;"></div>
+                    <div style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: center;">
+                        <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem;">
+                            {formatDate(featured.publishedAt)}
+                        </p>
+                        <h2 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--dark); line-height: 1.25; margin-bottom: 1rem;">
+                            {featured.title}
+                        </h2>
+                        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.65; margin-bottom: 1.5rem;">
+                            {excerpt(featured.body, 180)}
+                        </p>
+                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">
+                            Lees verder →
+                        </span>
                     </div>
-                    <a href={`/blog/${featured.slug?.current}`} style="display: block; text-decoration: none;">
-                        <div style={`background: ${gradients[0]}; border-radius: 4px; padding: 3.5rem 3rem; position: relative; overflow: hidden; min-height: 320px; display: flex; flex-direction: column; justify-content: flex-end;`}>
-                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%);"></div>
-                            <div style="position: relative; z-index: 1;">
-                                <p style="font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 0.75rem;">
-                                    {formatDate(featured.publishedAt)}
-                                </p>
-                                <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 700; color: white; line-height: 1.2; max-width: 680px; margin-bottom: 1rem;">
-                                    {featured.title}
-                                </h1>
-                                <p style="color: rgba(255,255,255,0.85); font-size: 1rem; max-width: 560px; line-height: 1.6; margin-bottom: 1.5rem;">
-                                    {excerpt(featured.body, 180)}
-                                </p>
-                                <span style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 600; color: white; border-bottom: 1px solid rgba(255,255,255,0.5); padding-bottom: 2px;">
-                                    Lees verder →
-                                </span>
-                            </div>
-                        </div>
+                </a>
+            </section>
+        )}
+
+        <!-- RECENT POSTS -->
+        {rest.length > 0 && (
+            <section>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                    <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0;">
+                        Meer artikelen
+                    </p>
+                    <a href="/blog" style="font-size: 0.875rem; color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">
+                        Alles bekijken →
                     </a>
-                </section>
-            )}
-
-            {rest.length > 0 && (
-                <section>
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-                        <span style="font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terracotta);">Laatste verhalen</span>
-                        <div style="flex: 1; height: 1px; background: var(--border);"></div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
-                        {rest.map((post: any, i: number) => (
-                            <a href={`/blog/${post.slug?.current}`} style="display: block; text-decoration: none; background: white; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(44,26,14,0.1)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
-                                <div style={`${gradients[(i + 1) % gradients.length]}; height: 160px;`}></div>
-                                <div style="padding: 1.5rem;">
-                                    <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem;">
-                                        {formatDate(post.publishedAt)}
-                                    </p>
-                                    <h2 style="font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--warm-dark); margin-bottom: 0.75rem; line-height: 1.3;">
-                                        {post.title}
-                                    </h2>
-                                    <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin: 0;">
-                                        {excerpt(post.body)}
-                                    </p>
-                                </div>
-                            </a>
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {posts.length === 0 && (
-                <div style="text-align: center; padding: 6rem 0; color: var(--muted);">
-                    <p style="font-family: 'Playfair Display', serif; font-size: 1.5rem;">Binnenkort meer verhalen...</p>
                 </div>
-            )}
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                    {rest.map((post: any) => (
+                        <a href={`/blog/${post.slug?.current}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)'" onmouseout="this.style.boxShadow='none'">
+                            <div style="background: #EDE8E2; height: 140px;"></div>
+                            <div style="padding: 1.25rem;">
+                                <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem;">
+                                    {formatDate(post.publishedAt)}
+                                </p>
+                                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--dark); line-height: 1.3; margin-bottom: 0.5rem;">
+                                    {post.title}
+                                </h3>
+                                <p style="font-size: 0.875rem; color: var(--muted); line-height: 1.6; margin: 0;">
+                                    {excerpt(post.body, 100)}
+                                </p>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            </section>
+        )}
 
-        </main>
+        {posts.length === 0 && (
+            <p style="color: var(--muted); font-size: 1rem;">Binnenkort verschijnen hier de eerste artikelen.</p>
+        )}
 
-        <Footer />
-    </body>
+    </main>
+
+    <Footer />
+</body>
 </html>
