@@ -7,7 +7,7 @@ import { sanityClient } from 'sanity:client';
 
 const posts = await sanityClient.fetch(`
   *[_type == "post"] | order(publishedAt desc) {
-    title, slug, publishedAt, body
+    title, slug, publishedAt, body, imageUrl
   }
 `);
 
@@ -53,7 +53,7 @@ function excerpt(body: string, length = 130) {
                     Nieuwste artikel
                 </p>
                 <a href={`/blog/${featured.slug?.current}`} style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--white); transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)'" onmouseout="this.style.boxShadow='none'">
-                    <div style="background: #E8E0D8; min-height: 280px;"></div>
+                    <div style={`background: #E8E0D8; min-height: 280px; ${featured.imageUrl ? `background-image: url('${featured.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
                     <div style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: center;">
                         <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem;">
                             {formatDate(featured.publishedAt)}
@@ -86,7 +86,7 @@ function excerpt(body: string, length = 130) {
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
                     {rest.map((post: any) => (
                         <a href={`/blog/${post.slug?.current}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)'" onmouseout="this.style.boxShadow='none'">
-                            <div style="background: #EDE8E2; height: 140px;"></div>
+                            <div style={`background: #EDE8E2; height: 140px; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
                             <div style="padding: 1.25rem;">
                                 <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem;">
                                     {formatDate(post.publishedAt)}

@@ -7,7 +7,7 @@ import { sanityClient } from 'sanity:client';
 
 const posts = await sanityClient.fetch(`
     *[_type == "post"] | order(publishedAt desc) {
-        title, slug, publishedAt, body
+        title, slug, publishedAt, body, imageUrl
     }
 `);
 
@@ -46,7 +46,7 @@ function excerpt(body: string, length = 120) {
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
                 {posts.map((post: any) => (
                     <a href={`/blog/${post.slug?.current}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)'" onmouseout="this.style.boxShadow='none'">
-                        <div style="background: #EDE8E2; height: 150px;"></div>
+                        <div style={`background: #EDE8E2; height: 150px; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
                         <div style="padding: 1.25rem;">
                             <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem;">
                                 {formatDate(post.publishedAt)}
