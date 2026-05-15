@@ -10,7 +10,7 @@ const currentPath = Astro.url.pathname;
         </a>
 
         <nav style="display: flex; align-items: center; gap: 2rem;">
-            {[['/', 'Home'], ['/blog', 'Artikelen'], ['/about', 'Over ons']].map(([href, label]) => (
+            {[['/', 'Home'], ['/blog', 'Blogs'], ['/about', 'Over ons']].map(([href, label]) => (
                 <a
                     href={href}
                     style={`font-size: 0.9rem; font-weight: 500; transition: color 0.15s; ${currentPath === href ? 'color: var(--accent);' : 'color: var(--muted);'}`}

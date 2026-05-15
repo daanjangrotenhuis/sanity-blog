@@ -15,7 +15,7 @@ const today = new Date();
         </div>
 
         <nav style="display: flex; gap: 2rem;">
-            {[['/', 'Home'], ['/blog', 'Artikelen'], ['/about', 'Over ons']].map(([href, label]) => (
+            {[['/', 'Home'], ['/blog', 'Blogs'], ['/about', 'Over ons']].map(([href, label]) => (
                 <a href={href} style="font-size: 0.875rem; color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">{label}</a>
             ))}
         </nav>

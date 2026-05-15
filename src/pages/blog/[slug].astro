@@ -54,21 +54,50 @@ const articleSchema = {
         "url": "https://www.vakantievoorkids.nl"
     }
 };
+
+const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.vakantievoorkids.nl"
+        },
+        {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Blogs",
+            "item": "https://www.vakantievoorkids.nl/blog"
+        },
+        {
+            "@type": "ListItem",
+            "position": 3,
+            "name": post.title,
+            "item": `https://www.vakantievoorkids.nl/blog/${post.slug.current}`
+        }
+    ]
+};
 ---
 
 <!doctype html>
 <html lang="nl">
 <head>
-    <BaseHead title={`${post.title} — ${SITE_TITLE}`} description={excerpt(post.body, 160)} schema={articleSchema} />
+    <BaseHead title={`${post.title} — ${SITE_TITLE}`} description={excerpt(post.body, 160)} schema={[articleSchema, breadcrumbSchema]} />
 </head>
 <body>
     <Header />
 
     <main style="max-width: 720px; margin: 0 auto; padding: 3.5rem 1.5rem;">
 
-        <a href="/" style="font-size: 0.875rem; color: var(--muted); display: inline-block; margin-bottom: 2.5rem;" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">
-            ← Terug
-        </a>
+        <nav aria-label="Breadcrumb" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.825rem; color: var(--muted); margin-bottom: 2.5rem; flex-wrap: wrap;">
+            <a href="/" style="color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">Home</a>
+            <span>/</span>
+            <a href="/blog" style="color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">Blogs</a>
+            <span>/</span>
+            <span style="color: var(--dark);">{post.title}</span>
+        </nav>
 
         <article>
             <div style="margin-bottom: 2rem;">
@@ -92,7 +121,7 @@ const articleSchema = {
         <hr style="border: none; border-top: 1px solid var(--border); margin: 3.5rem 0 2rem;" />
 
         <a href="/" style="font-size: 0.875rem; color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">
-            ← Meer artikelen
+            ← Meer blogs
         </a>
 
     </main>

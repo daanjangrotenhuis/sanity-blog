@@ -26,7 +26,7 @@ function excerpt(body: string, length = 120) {
 <!doctype html>
 <html lang="nl">
 <head>
-    <BaseHead title={`Artikelen — ${SITE_TITLE}`} description="Alle reisverhalen en tips voor vakanties met kinderen." />
+    <BaseHead title={`Blogs — ${SITE_TITLE}`} description="Alle reisverhalen en tips voor vakanties met kinderen." />
 </head>
 <body>
     <Header />
@@ -35,7 +35,7 @@ function excerpt(body: string, length = 120) {
 
         <div style="margin-bottom: 3rem;">
             <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">
-                Alle artikelen
+                Alle Blogs
             </h1>
             <p style="font-size: 0.95rem; color: var(--muted); margin: 0;">
                 {posts.length} artikel{posts.length !== 1 ? 'en' : ''}
