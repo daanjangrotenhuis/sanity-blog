@@ -108,7 +108,7 @@ const breadcrumbSchema = {
 
         <hr style="border: none; border-top: 1px solid var(--border); margin: 3.5rem 0 2rem;" />
 
-        <a href="/blog" style="font-size: 0.875rem; color: var(--accent); font-weight: 500;" onmouseover="this.style.color='var(--accent-dark)'" onmouseout="this.style.color='var(--accent)'">
+        <a href="/blog" style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; color: var(--primary); font-weight: 700;" onmouseover="this.style.color='var(--primary-dark)'" onmouseout="this.style.color='var(--primary)'">
             ← Meer blogs lezen
         </a>
 
@@ -116,19 +116,19 @@ const breadcrumbSchema = {
 
     <!-- RELATED -->
     {related.length > 0 && (
-        <section style="background: var(--white); border-top: 1px solid var(--border); padding: 4rem 1.5rem; margin-top: 3rem;">
+        <section style="background: var(--primary-light); border-top: 1px solid var(--border); padding: 4rem 1.5rem; margin-top: 3rem;">
             <div style="max-width: 1140px; margin: 0 auto;">
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-                    <span style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">Meer lezen</span>
+                    <span style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary-dark);">Meer lezen</span>
                     <div style="flex: 1; height: 1px; background: var(--border);"></div>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
-                    {related.map((p: any) => (
-                        <a href={`/blog/${p.slug?.current}`} style="display: block; background: var(--cream); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; text-decoration: none; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(24,33,30,0.07)'" onmouseout="this.style.boxShadow='none'">
-                            <div style={`height: 140px; background: #C8DFDB; ${p.imageUrl ? `background-image: url('${p.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
+                    {related.map((p: any, i: number) => (
+                        <a href={`/blog/${p.slug?.current}`} style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i === 0 ? 'var(--primary)' : i === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; overflow: hidden; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;`} onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(13,40,48,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                            <div style={`height: 140px; background: var(--primary-light); ${p.imageUrl ? `background-image: url('${p.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
                             <div style="padding: 1.1rem 1.25rem 1.35rem;">
-                                <p style="font-size: 0.75rem; color: var(--muted-light); margin-bottom: 0.35rem;">{formatDate(p.publishedAt)}</p>
-                                <h4 style="font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; color: var(--dark); line-height: 1.3; margin: 0;">{p.title}</h4>
+                                <p style="font-family: 'Nunito', sans-serif; font-size: 0.75rem; color: var(--muted-light); margin-bottom: 0.35rem;">{formatDate(p.publishedAt)}</p>
+                                <h4 style="font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; color: var(--dark); line-height: 1.3; margin: 0; font-optical-sizing: auto;">{p.title}</h4>
                             </div>
                         </a>
                     ))}

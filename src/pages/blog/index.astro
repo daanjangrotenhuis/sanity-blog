@@ -27,34 +27,39 @@ function excerpt(body: string, length = 110) {
 <html lang="nl">
 <head>
     <BaseHead title={`Blogs — ${SITE_TITLE}`} description="Alle reisverhalen en tips voor vakanties met kinderen." />
+    <style>
+        .blog-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,40,48,0.12) !important; }
+    </style>
 </head>
-<body>
+<body style="background: var(--cream);">
     <Header />
 
-    <div style="background: var(--dark); padding: 3rem 1.5rem 2.5rem;">
-        <div style="max-width: 1140px; margin: 0 auto;">
-            <p style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem;">Vakantie voor Kids</p>
-            <h1 style="font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 3.5vw, 2.4rem); font-weight: 700; color: white; margin-bottom: 0.5rem;">
+    <!-- PAGE HERO -->
+    <section style="background: var(--dark); padding: 3.5rem 2rem 3rem;">
+        <div style="max-width: 1160px; margin: 0 auto;">
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem;">Vakantie voor Kids</p>
+            <h1 style="font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; color: white; margin-bottom: 0.5rem; font-optical-sizing: auto;">
                 Alle blogs
             </h1>
-            <p style="font-size: 0.9rem; color: #8AABA6; margin: 0;">
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: rgba(255,255,255,0.45); margin: 0;">
                 {posts.length} blog{posts.length !== 1 ? 's' : ''} over vakanties met kinderen
             </p>
         </div>
-    </div>
+    </section>
 
-    <main style="max-width: 1140px; margin: 0 auto; padding: 3.5rem 1.5rem;">
+    <main style="max-width: 1160px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem;">
         {posts.length > 0 ? (
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-                {posts.map((post: any) => (
-                    <a href={`/blog/${post.slug?.current}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; text-decoration: none; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 6px 24px rgba(24,33,30,0.09)'" onmouseout="this.style.boxShadow='none'">
-                        <div style={`height: 200px; background: #C8DFDB; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
+                {posts.map((post: any, i: number) => (
+                    <a href={`/blog/${post.slug?.current}`} class="blog-card" style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(13,40,48,0.05);`}>
+                        <div style={`height: 200px; background: var(--primary-light); ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
                         <div style="padding: 1.25rem 1.5rem 1.6rem;">
-                            <p style="font-size: 0.75rem; color: var(--muted-light); margin-bottom: 0.5rem;">{formatDate(post.publishedAt)}</p>
-                            <h2 style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.35; margin-bottom: 0.6rem;">
+                            <p style="font-family: 'Nunito', sans-serif; font-size: 0.75rem; color: var(--muted-light); margin-bottom: 0.5rem;">{formatDate(post.publishedAt)}</p>
+                            <h2 style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.35; margin-bottom: 0.6rem; font-optical-sizing: auto;">
                                 {post.title}
                             </h2>
-                            <p style="font-size: 0.875rem; color: var(--muted); line-height: 1.65; margin: 0;">
+                            <p style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; color: var(--muted); line-height: 1.65; margin: 0;">
                                 {excerpt(post.body)}
                             </p>
                         </div>
@@ -62,7 +67,7 @@ function excerpt(body: string, length = 110) {
                 ))}
             </div>
         ) : (
-            <p style="color: var(--muted);">Binnenkort verschijnen hier de eerste blogs.</p>
+            <p style="font-family: 'Nunito', sans-serif; color: var(--muted);">Binnenkort verschijnen hier de eerste blogs.</p>
         )}
     </main>
 
