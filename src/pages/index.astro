@@ -1,7 +1,6 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { sanityClient } from 'sanity:client';
 
@@ -12,103 +11,337 @@ const posts = await sanityClient.fetch(`
 `);
 
 const featured = posts[0];
-const rest = posts.slice(1);
+const recent = posts.slice(1, 4);
+const popular = posts.slice(0, 3);
 
 function formatDate(dateStr: string) {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
-
 function excerpt(body: string, length = 130) {
     if (!body) return '';
     const plain = body.replace(/<[^>]+>/g, '');
     return plain.length > length ? plain.slice(0, length).trimEnd() + '…' : plain;
 }
+
+const categories = [
+    { icon: 'Strand', label: 'Strand & Zee', desc: 'Zonnige bestemmingen' },
+    { icon: 'Camping', label: 'Camping', desc: 'Slapen onder de sterren' },
+    { icon: 'Park', label: 'Vakantiepark', desc: 'Alles op één plek' },
+    { icon: 'Vlieg', label: 'Buitenland', desc: 'Ver van huis' },
+    { icon: 'Dag', label: 'Dagtrips', desc: 'Een dag er tussenuit' },
+    { icon: 'Natuur', label: 'Natuur', desc: 'Bossen & heide' },
+];
 ---
 
 <!doctype html>
 <html lang="nl">
 <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+        html { scroll-behavior: smooth; }
+
+        /* Outlined text */
+        .text-outline { -webkit-text-stroke: 2.5px white; color: transparent; }
+
+        /* Nav hover */
+        .nav-link { transition: color 0.15s; }
+        .nav-link:hover { color: white !important; }
+
+        /* Centered nav logo */
+        .hero-nav {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 1.75rem 2.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        .hero-nav-left { display: flex; gap: 2rem; }
+        .hero-nav-right { display: flex; justify-content: flex-end; align-items: center; gap: 2rem; }
+
+        /* Floating ghost words in hero */
+        .hero-ghost {
+            position: absolute;
+            font-family: 'Fraunces', serif;
+            font-weight: 700;
+            color: rgba(255,255,255,0.07);
+            pointer-events: none;
+            white-space: nowrap;
+            font-optical-sizing: auto;
+            user-select: none;
+        }
+
+        /* Trust chips in hero */
+        .hero-chip {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 0.4rem 0.9rem;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Category pills — all in the primary turquoise family */
+        .cat-pill {
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            background: var(--primary-light);
+            border: 1.5px solid #A8E8E2;
+            padding: 0.5rem 1.1rem;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: all 0.15s;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .cat-pill:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,180,166,0.25);
+        }
+
+        /* Blog cards */
+        .card-accent-teal  { border-top: 3px solid var(--teal); }
+        .card-accent-coral { border-top: 3px solid var(--coral); }
+        .card-accent-sun   { border-top: 3px solid var(--sun); }
+
+        .cinematic:hover .cinematic-img { transform: scale(1.03); }
+        .cinematic-img { transition: transform 0.6s ease; }
+        .lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .lift:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(26,31,30,0.12) !important; }
+    </style>
 </head>
-<body>
-    <Header />
+<body style="background: var(--cream);">
 
-    <main style="max-width: 1100px; margin: 0 auto; padding: 4rem 1.5rem;">
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- HERO — full screen, wave bottom transition     -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <section style="min-height: 100vh; background: #0D2830; display: flex; flex-direction: column; position: relative; overflow: hidden; background-image: url('/hero.jpg'); background-size: cover; background-position: center;">
 
-        <!-- INTRO -->
-        <div style="max-width: 560px; margin-bottom: 4rem;">
-            <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 2.6rem); font-weight: 700; color: var(--dark); line-height: 1.2; margin-bottom: 1rem;">
-                Vakanties die kinderen nooit vergeten
-            </h1>
-            <p style="font-size: 1.05rem; color: var(--muted); line-height: 1.75; margin: 0;">
-                Eerlijke verhalen, praktische tips en de mooiste bestemmingen voor gezinnen met kinderen. Geen reclame, gewoon goede reistips.
+        <!-- gradient overlay — ocean tint, lets photo breathe -->
+        <div style="position: absolute; inset: 0; background: linear-gradient(170deg, rgba(13,40,48,0.68) 0%, rgba(0,100,100,0.22) 50%, rgba(13,40,48,0.60) 100%);"></div>
+
+        <!-- floating ghost destination words -->
+        <span class="hero-ghost" style="font-size: 9rem; top: 8%; right: -2%; opacity: 0.035; transform: rotate(6deg);">Italië</span>
+        <span class="hero-ghost" style="font-size: 6rem; bottom: 30%; right: 8%; opacity: 0.03; transform: rotate(-4deg);">Camping</span>
+        <span class="hero-ghost" style="font-size: 5rem; top: 35%; right: 18%; opacity: 0.025; transform: rotate(3deg);">Strand</span>
+        <span class="hero-ghost" style="font-size: 7rem; bottom: 14%; left: 48%; opacity: 0.03; transform: rotate(-6deg);">Spanje</span>
+
+        <!-- NAV — centered logo grid -->
+        <nav class="hero-nav" style="position: relative;">
+            <div class="hero-nav-left">
+                {[['/', 'Home'], ['/blog', 'Blogs']].map(([href, label]) => (
+                    <a href={href} class="nav-link" style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; font-weight: 600; color: rgba(255,255,255,0.55); text-decoration: none;">{label}</a>
+                ))}
+            </div>
+
+            <a href="/" style="text-decoration: none; display: flex; align-items: baseline; justify-content: center; gap: 0;">
+                <span style="font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 700; color: white; font-optical-sizing: auto; letter-spacing: -0.01em;">Vakantie</span>
+                <span style="font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 300; font-style: italic; color: var(--yellow); font-optical-sizing: auto;">&nbsp;voor Kids</span>
+            </a>
+
+            <div class="hero-nav-right">
+                <a href="/about" class="nav-link" style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; font-weight: 600; color: rgba(255,255,255,0.55); text-decoration: none;">Over ons</a>
+                <a href="/blog" style="font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700; background: var(--orange); color: var(--dark); padding: 0.5rem 1.2rem; border-radius: 30px; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='var(--orange-dark)'" onmouseout="this.style.background='var(--orange)'">
+                    Alle blogs
+                </a>
+            </div>
+        </nav>
+
+        <!-- HERO CONTENT -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 2rem 2.5rem 7rem; position: relative; z-index: 10;">
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 1.75rem;">
+                Eerlijke reisgids voor gezinnen
             </p>
+            <h1 style="font-family: 'Fraunces', serif; line-height: 0.93; font-optical-sizing: auto; margin: 0 0 2rem; max-width: 840px;">
+                <span class="text-outline" style="font-size: clamp(3.2rem, 8vw, 6.5rem); font-weight: 700; display: block; letter-spacing: -0.02em;">Strandpret,</span>
+                <span style="font-size: clamp(3.2rem, 8vw, 6.5rem); font-weight: 700; color: white; display: block; letter-spacing: -0.02em;">avontuur &</span>
+                <em style="font-size: clamp(2.2rem, 5.5vw, 4.5rem); font-weight: 300; font-style: italic; color: var(--yellow); display: block; padding-left: 0.1em; margin-top: 0.15em;">herinneringen voor het leven.</em>
+            </h1>
+
+            <!-- trust chips -->
+            <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 2.5rem;">
+                <span class="hero-chip">100+ blogs</span>
+                <span class="hero-chip">Eerlijk & onafhankelijk</span>
+                <span class="hero-chip">Door ouders, voor ouders</span>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                <a href="/blog" style="font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; background: var(--orange); color: var(--dark); padding: 0.9rem 2rem; border-radius: 30px; text-decoration: none; transition: background 0.15s; display: inline-block; box-shadow: 0 4px 16px rgba(232,168,32,0.35);" onmouseover="this.style.background='var(--orange-dark)'" onmouseout="this.style.background='var(--orange)'">
+                    Ontdek onze tips →
+                </a>
+                <a href="/about" style="font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.9rem; color: rgba(255,255,255,0.8); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 1px;">
+                    Over ons
+                </a>
+            </div>
         </div>
 
-        <!-- FEATURED POST -->
-        {featured && (
-            <section style="margin-bottom: 4.5rem;">
-                <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem;">
-                    Nieuwste artikel
-                </p>
-                <a href={`/blog/${featured.slug?.current}`} style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--white); transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.07)'" onmouseout="this.style.boxShadow='none'">
-                    <div style={`background: #E8E0D8; min-height: 280px; ${featured.imageUrl ? `background-image: url('${featured.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
-                    <div style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: center;">
-                        <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 0.75rem;">
-                            {formatDate(featured.publishedAt)}
-                        </p>
-                        <h2 style="font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--dark); line-height: 1.25; margin-bottom: 1rem;">
+        <!-- wave transition to cream -->
+        <div style="position: absolute; bottom: -2px; left: 0; right: 0; z-index: 5; line-height: 0;">
+            <svg viewBox="0 0 1440 90" xmlns="http://www.w3.org/2000/svg" style="display: block; width: 100%; height: 90px;">
+                <path d="M0,45 C180,90 360,10 540,50 C720,88 900,15 1080,48 C1260,80 1380,30 1440,45 L1440,90 L0,90 Z" fill="#FDFBF7"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- QUICK CATEGORY STRIP — right after wave        -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div style="background: var(--cream); padding: 2.5rem 1.5rem 0;">
+        <div style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; justify-content: center;">
+            <span style="font-family: 'Nunito', sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--muted-light); margin-right: 0.25rem;">Waar zoek je naar?</span>
+            {categories.map(cat => (
+                <a href="/blog" class="cat-pill">{cat.label}</a>
+            ))}
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- LATEST BLOGS                                   -->
+    <!-- ═══════════════════════════════════════════════ -->
+    {featured && (
+        <section style="background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 5rem 1.5rem;">
+            <div style="max-width: 1160px; margin: 0 auto;">
+                <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.6rem;">Vers van de pers</p>
+                        <h2 style="font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 700; color: var(--dark); font-optical-sizing: auto;">Nieuwste blogs</h2>
+                    </div>
+                    <a href="/blog" style="font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--teal);" onmouseover="this.style.color='var(--teal-dark)'" onmouseout="this.style.color='var(--teal)'">Alle blogs →</a>
+                </div>
+
+                <!-- featured post: big cinematic -->
+                <a href={`/blog/${featured.slug?.current}`} class="cinematic" style="display: block; position: relative; border-radius: 16px; overflow: hidden; height: 480px; text-decoration: none; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(26,31,30,0.1);">
+                    <div class="cinematic-img" style={`position: absolute; inset: 0; background: #2A4A46; ${featured.imageUrl ? `background-image: url('${featured.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
+                    <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,30,28,0.9) 0%, rgba(20,30,28,0.2) 60%, transparent 90%);"></div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5rem 3rem;">
+                        <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem;">{formatDate(featured.publishedAt)}</p>
+                        <h3 style="font-family: 'Fraunces', serif; font-size: clamp(1.5rem, 3vw, 2.4rem); font-weight: 700; color: white; line-height: 1.2; max-width: 680px; font-optical-sizing: auto; margin-bottom: 1rem;">
                             {featured.title}
-                        </h2>
-                        <p style="font-size: 0.95rem; color: var(--muted); line-height: 1.65; margin-bottom: 1.5rem;">
-                            {excerpt(featured.body, 180)}
-                        </p>
-                        <span style="font-size: 0.9rem; font-weight: 600; color: var(--accent);">
+                        </h3>
+                        <span style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--dark); background: var(--orange); padding: 0.55rem 1.25rem; border-radius: 30px; display: inline-block; box-shadow: 0 4px 12px rgba(232,168,32,0.4);">
                             Lees verder →
                         </span>
                     </div>
                 </a>
-            </section>
-        )}
 
-        <!-- RECENT POSTS -->
-        {rest.length > 0 && (
-            <section>
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
-                    <p style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin: 0;">
-                        Meer blogs
-                    </p>
-                    <a href="/blog" style="font-size: 0.875rem; color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">
-                        Alle blogs →
-                    </a>
+                <!-- 3 smaller posts below -->
+                {recent.length > 0 && (
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                        {recent.map((post: any, i: number) => (
+                            <a href={`/blog/${post.slug?.current}`} class={`lift ${i === 0 ? 'card-accent-teal' : i === 1 ? 'card-accent-coral' : 'card-accent-sun'}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(26,31,30,0.05);">
+                                <div style={`height: 170px; background: #2A4A46; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
+                                <div style="padding: 1.1rem 1.25rem 1.35rem;">
+                                    <p style="font-family: 'Nunito', sans-serif; font-size: 0.72rem; color: var(--muted-light); margin-bottom: 0.4rem;">{formatDate(post.publishedAt)}</p>
+                                    <h4 style="font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 700; color: var(--dark); line-height: 1.3; font-optical-sizing: auto;">{post.title}</h4>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
+    )}
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- OVER ONS SNIPPET                              -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <section style="background: var(--mint); padding: 6rem 1.5rem;"><div style="max-width: 1160px; margin: 0 auto;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;">
+            <div>
+                <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.75rem;">Over ons</p>
+                <h2 style="font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700; color: var(--dark); line-height: 1.2; margin-bottom: 1.25rem; font-optical-sizing: auto;">
+                    Wij kennen de uitdagingen van reizen met kinderen
+                </h2>
+                <p style="font-family: 'Nunito', sans-serif; font-size: 1rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem;">
+                    Vakantie voor Kids is opgericht door ouders die weten hoe lastig het is om de perfecte gezinsvakantie te vinden. Geen eindeloos scrollen door recensies — wij zetten de beste vakantieparken, campings en bestemmingen voor je op een rij.
+                </p>
+                <p style="font-family: 'Nunito', sans-serif; font-size: 1rem; color: var(--muted); line-height: 1.8; margin-bottom: 2rem;">
+                    Eerlijk, praktisch, en altijd vanuit het perspectief van een gezin met kinderen.
+                </p>
+                <a href="/about" style="font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--teal); border-bottom: 2px solid var(--teal); padding-bottom: 2px;" onmouseover="this.style.color='var(--teal-dark)';this.style.borderColor='var(--teal-dark)'" onmouseout="this.style.color='var(--teal)';this.style.borderColor='var(--teal)'">
+                    Lees meer over ons →
+                </a>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                {[
+                    { num: '100+', label: 'Blogs geschreven' },
+                    { num: '50+',  label: 'Vakantieparken bezocht' },
+                    { num: '15+',  label: 'Landen ontdekt' },
+                    { num: '100%', label: 'Eerlijke verhalen' },
+                ].map((stat, i) => (
+                    <div style={`background: ${i % 2 === 0 ? 'var(--primary-light)' : 'var(--orange-light)'}; border-radius: 16px; padding: 1.75rem 1.5rem;`}>
+                        <div style={`font-family: 'Fraunces', serif; font-size: 2.4rem; font-weight: 700; color: ${i % 2 === 0 ? 'var(--primary-dark)' : 'var(--orange-dark)'}; line-height: 1; margin-bottom: 0.4rem; font-optical-sizing: auto;`}>{stat.num}</div>
+                        <div style="font-family: 'Nunito', sans-serif; font-size: 0.85rem; color: var(--dark); font-weight: 600;">{stat.label}</div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div></section>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- POPULAR POSTS — warm sand band                 -->
+    <!-- ═══════════════════════════════════════════════ -->
+    {popular.length > 0 && (
+        <section style="background: var(--sand); padding: 5rem 1.5rem;">
+            <div style="max-width: 1160px; margin: 0 auto;">
+                <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange); margin-bottom: 0.6rem;">Meest gelezen</p>
+                        <h2 style="font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 700; color: var(--dark); font-optical-sizing: auto;">Populaire blogs</h2>
+                    </div>
+                    <a href="/blog" style="font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--teal);" onmouseover="this.style.color='var(--teal-dark)'" onmouseout="this.style.color='var(--teal)'">Alles bekijken →</a>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
-                    {rest.map((post: any) => (
-                        <a href={`/blog/${post.slug?.current}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; transition: box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.06)'" onmouseout="this.style.boxShadow='none'">
-                            <div style={`background: #EDE8E2; height: 140px; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
-                            <div style="padding: 1.25rem;">
-                                <p style="font-size: 0.78rem; color: var(--muted); margin-bottom: 0.4rem;">
-                                    {formatDate(post.publishedAt)}
-                                </p>
-                                <h3 style="font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--dark); line-height: 1.3; margin-bottom: 0.5rem;">
-                                    {post.title}
-                                </h3>
-                                <p style="font-size: 0.875rem; color: var(--muted); line-height: 1.6; margin: 0;">
-                                    {excerpt(post.body, 100)}
-                                </p>
+                    {popular.map((post: any, i: number) => (
+                        <a href={`/blog/${post.slug?.current}`} class="lift" style="display: block; text-decoration: none; border-radius: 14px; overflow: hidden; position: relative; box-shadow: 0 2px 12px rgba(26,31,30,0.08);">
+                            <div style={`height: 260px; background: #2A4A46; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
+                            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,30,28,0.82) 0%, transparent 55%);"></div>
+                            <div style="position: absolute; top: 1rem; left: 1rem;">
+                                <span style={`font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 700; color: ${i === 0 ? 'var(--yellow)' : i === 1 ? 'var(--orange)' : 'var(--primary)'}; font-optical-sizing: auto; text-shadow: 0 2px 8px rgba(0,0,0,0.3);`}>{String(i + 1).padStart(2, '0')}</span>
+                            </div>
+                            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 1.25rem 1.4rem;">
+                                <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-bottom: 0.35rem;">{formatDate(post.publishedAt)}</p>
+                                <h4 style="font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: white; line-height: 1.3; font-optical-sizing: auto;">{post.title}</h4>
                             </div>
                         </a>
                     ))}
                 </div>
-            </section>
-        )}
+            </div>
+        </section>
+    )}
 
-        {posts.length === 0 && (
-            <p style="color: var(--muted); font-size: 1rem;">Binnenkort verschijnen hier de eerste artikelen.</p>
-        )}
-
-    </main>
+    <!-- ═══════════════════════════════════════════════ -->
+    <!-- NEWSLETTER — warm yellow                       -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <section style="padding: 5rem 1.5rem; background: var(--sun-light);">
+        <div style="max-width: 560px; margin: 0 auto; text-align: center;">
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orange-dark); margin-bottom: 0.75rem;">Blijf op de hoogte</p>
+            <h2 style="font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 3vw, 2.2rem); font-weight: 700; color: var(--dark); margin-bottom: 1rem; font-optical-sizing: auto;">
+                Geen vakantietip missen?
+            </h2>
+            <p style="font-family: 'Nunito', sans-serif; font-size: 1rem; color: var(--muted); line-height: 1.75; margin-bottom: 2rem;">
+                Schrijf je in en ontvang de beste reistips, vakantieparken en aanbiedingen rechtstreeks in je inbox.
+            </p>
+            <form style="display: flex; gap: 0.75rem; max-width: 420px; margin: 0 auto;" onsubmit="return false;">
+                <input type="email" placeholder="jouw@email.nl" style="flex: 1; font-family: 'Nunito', sans-serif; font-size: 0.9rem; padding: 0.8rem 1.1rem; border: 2px solid #F5DFA0; border-radius: 30px; background: white; color: var(--dark); outline: none;" />
+                <button type="submit" style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; font-weight: 700; background: var(--orange); color: var(--dark); padding: 0.8rem 1.4rem; border-radius: 30px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.15s; box-shadow: 0 4px 12px rgba(232,168,32,0.3);" onmouseover="this.style.background='var(--orange-dark)'" onmouseout="this.style.background='var(--orange)'">
+                    Inschrijven
+                </button>
+            </form>
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.75rem; color: var(--muted-light); margin-top: 0.75rem;">Geen spam. Uitschrijven kan altijd.</p>
+        </div>
+    </section>
 
     <Footer />
 </body>

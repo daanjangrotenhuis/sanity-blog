@@ -2,27 +2,46 @@
 const today = new Date();
 ---
 
-<footer style="border-top: 1px solid var(--border); margin-top: 6rem; padding: 3rem 1.5rem;">
-    <div style="max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+<footer style="background: var(--dark); color: #8AABA6; margin-top: 6rem;">
+    <div style="max-width: 1140px; margin: 0 auto; padding: 4rem 1.5rem 2.5rem;">
 
-        <div>
-            <div style="font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem;">
-                Vakantie voor Kids
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; padding-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.07);">
+
+            <div>
+                <div style="font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 700; color: white; margin-bottom: 0.3rem;">Vakantie voor Kids</div>
+                <div style="font-size: 0.7rem; font-weight: 600; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.1rem;">vakantievoorkids.nl</div>
+                <p style="font-size: 0.9rem; line-height: 1.7; max-width: 280px; margin: 0; color: #8AABA6;">
+                    Eerlijke reisverhalen en praktische tips voor ouders die de mooiste vakanties willen beleven met hun kinderen.
+                </p>
             </div>
-            <p style="font-size: 0.85rem; color: var(--muted); margin: 0;">
-                Reistips en inspiratie voor gezinnen.
-            </p>
+
+            <div>
+                <div style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: white; margin-bottom: 1.25rem;">Navigatie</div>
+                <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                    {[['/', 'Home'], ['/blog', 'Blogs'], ['/about', 'Over ons']].map(([href, label]) => (
+                        <a href={href} style="font-size: 0.9rem; color: #8AABA6; transition: color 0.15s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#8AABA6'">{label}</a>
+                    ))}
+                </div>
+            </div>
+
+            <div>
+                <div style="font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: white; margin-bottom: 1.25rem;">Onderwerpen</div>
+                <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                    {['Vakantieparken', 'Strand & Zee', 'Camping', 'Buitenland', 'Dagtrips'].map(cat => (
+                        <a href="/blog" style="font-size: 0.9rem; color: #8AABA6; transition: color 0.15s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#8AABA6'">{cat}</a>
+                    ))}
+                </div>
+            </div>
+
         </div>
 
-        <nav style="display: flex; gap: 2rem;">
-            {[['/', 'Home'], ['/blog', 'Blogs'], ['/about', 'Over ons']].map(([href, label]) => (
-                <a href={href} style="font-size: 0.875rem; color: var(--muted);" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted)'">{label}</a>
-            ))}
-        </nav>
-
-        <p style="font-size: 0.8rem; color: var(--muted); margin: 0;">
-            &copy; {today.getFullYear()} vakantievoorkids.nl
-        </p>
+        <div style="padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <p style="font-size: 0.8rem; margin: 0; color: #8AABA6;">&copy; {today.getFullYear()} Vakantie voor Kids. Alle rechten voorbehouden.</p>
+            <div style="display: flex; gap: 1.5rem;">
+                <a href="#" style="font-size: 0.8rem; color: #8AABA6;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#8AABA6'">Privacy</a>
+                <a href="#" style="font-size: 0.8rem; color: #8AABA6;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#8AABA6'">Disclaimer</a>
+            </div>
+        </div>
 
     </div>
 </footer>

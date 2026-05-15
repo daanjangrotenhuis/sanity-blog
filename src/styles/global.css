@@ -1,34 +1,50 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400;1,9..144,600;1,9..144,700&family=Nunito:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --cream: #FAF8F5;
+    --cream: #F7FDFC;
     --white: #FFFFFF;
-    --dark: #1C1C1C;
-    --accent: #B85C2C;
-    --muted: #6B6560;
-    --border: #E4DDD6;
+    --dark: #0D2830;        /* deep ocean — replaces muddy green-black */
+    --primary: #00B4A6;     /* vibrant turquoise — THE dominant color */
+    --primary-dark: #008880;
+    --primary-light: #E0F8F5;
+    --orange: #E8A820;      /* warm golden yellow — CTAs only */
+    --orange-dark: #C48A10;
+    --orange-light: #FFFBEC;
+    --yellow: #FFD166;      /* sunny yellow — logo accent + highlights */
+    --muted: #4A6B6A;
+    --muted-light: #8AADAB;
+    --border: #D4EDEA;
+    /* legacy aliases so other pages don't break */
+    --teal: #00B4A6;
+    --teal-dark: #008880;
+    --teal-light: #E0F8F5;
+    --sand: #FFF3EE;
+    --coral: #E8A820;
+    --coral-light: #FFFBEC;
+    --sun: #FFD166;
+    --sun-light: #FFFBEB;
+    --mint: #E0F8F5;
 }
 
 * { box-sizing: border-box; }
-
 html { background: var(--cream); }
 
 body {
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Nunito', sans-serif;
     background: var(--cream);
     color: var(--dark);
     margin: 0;
     padding: 0;
-    font-size: 18px;
-    line-height: 1.7;
+    font-size: 17px;
+    line-height: 1.75;
     -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
-    line-height: 1.25;
+    font-family: 'Fraunces', serif;
+    line-height: 1.2;
     color: var(--dark);
     margin: 0;
 }
@@ -37,20 +53,42 @@ a { color: inherit; text-decoration: none; }
 img { max-width: 100%; height: auto; display: block; }
 p { margin: 0 0 1em; }
 
-.post-body h2 { font-size: 1.55rem; margin: 2.25rem 0 0.75rem; }
-.post-body h3 { font-size: 1.25rem; margin: 1.75rem 0 0.6rem; }
+/* Article body */
+.post-body { font-family: 'Nunito', sans-serif; font-size: 1.05rem; line-height: 1.85; }
+.post-body h2 { font-family: 'Fraunces', serif; font-size: 1.6rem; font-weight: 600; margin: 2.5rem 0 0.75rem; }
+.post-body h3 { font-family: 'Fraunces', serif; font-size: 1.25rem; font-weight: 600; margin: 2rem 0 0.6rem; }
 .post-body p { margin-bottom: 1.5em; }
 .post-body ul, .post-body ol { padding-left: 1.4rem; margin-bottom: 1.5em; }
-.post-body li { margin-bottom: 0.35em; }
-.post-body img { border-radius: 6px; margin: 2rem 0; width: 100%; }
-.post-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-.post-body strong { font-weight: 600; }
+.post-body li { margin-bottom: 0.4em; }
+.post-body img { border-radius: 10px; margin: 2rem 0; width: 100%; }
+.post-body a { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
+.post-body strong { font-weight: 700; }
 .post-body blockquote {
-    border-left: 3px solid var(--border);
-    padding: 0.25rem 0 0.25rem 1.25rem;
-    margin: 1.75rem 0;
-    color: var(--muted);
+    border-left: 3px solid var(--yellow);
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    margin: 2rem 0;
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
     font-style: italic;
+    color: var(--muted);
+}
+
+/* Card image zoom effect */
+.card-wrap { overflow: hidden; }
+.card-wrap img, .card-img-div {
+    transition: transform 0.4s ease;
+}
+.card-wrap:hover .card-img-div {
+    transform: scale(1.04);
+}
+
+.label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
 }
 
 .sr-only {
