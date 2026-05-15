@@ -37,12 +37,29 @@ function readingTime(body: string) {
     const plain = body.replace(/<[^>]+>/g, '');
     return Math.max(1, Math.ceil(plain.split(/\s+/).length / 200)).toString();
 }
+
+const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": excerpt(post.body, 160),
+    "datePublished": post.publishedAt,
+    "dateModified": post.publishedAt,
+    "image": post.imageUrl ?? null,
+    "url": `https://www.vakantievoorkids.nl/blog/${post.slug.current}`,
+    "inLanguage": "nl-NL",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Vakantie voor Kids",
+        "url": "https://www.vakantievoorkids.nl"
+    }
+};
 ---
 
 <!doctype html>
 <html lang="nl">
 <head>
-    <BaseHead title={`${post.title} — ${SITE_TITLE}`} description={excerpt(post.body, 160)} />
+    <BaseHead title={`${post.title} — ${SITE_TITLE}`} description={excerpt(post.body, 160)} schema={articleSchema} />
 </head>
 <body>
     <Header />
