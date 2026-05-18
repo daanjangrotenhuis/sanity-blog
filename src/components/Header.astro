@@ -2,8 +2,15 @@
 const currentPath = Astro.url.pathname;
 ---
 
+<style>
+    @media (max-width: 640px) {
+        .header-nav-link { display: none !important; }
+        .header-inner { padding: 0 1.25rem !important; }
+    }
+</style>
+
 <header style="background: var(--dark); position: sticky; top: 0; z-index: 100;">
-    <div style="max-width: 1160px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 66px;">
+    <div class="header-inner" style="max-width: 1160px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 66px;">
 
         <a href="/" style="text-decoration: none; display: flex; align-items: baseline; gap: 0;">
             <span style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; color: white; font-optical-sizing: auto;">Vakantie</span>
@@ -14,6 +21,7 @@ const currentPath = Astro.url.pathname;
             {[['/', 'Home'], ['/blog', 'Blogs'], ['/about', 'Over ons']].map(([href, label]) => (
                 <a
                     href={href}
+                    class="header-nav-link"
                     style={`font-family: 'Nunito', sans-serif; font-size: 0.875rem; font-weight: 600; padding: 0.4rem 0.9rem; border-radius: 20px; transition: all 0.15s; text-decoration: none; ${currentPath === href ? 'background: var(--primary); color: white;' : 'color: rgba(255,255,255,0.6);'}`}
                     onmouseover={`if(this.style.color !== 'white') { this.style.color='white'; }`}
                     onmouseout={`if(this.style.background !== 'var(--primary)') { this.style.color='rgba(255,255,255,0.6)'; }`}

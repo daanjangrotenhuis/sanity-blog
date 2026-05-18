@@ -30,6 +30,12 @@ function excerpt(body: string, length = 110) {
     <style>
         .blog-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
         .blog-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,40,48,0.12) !important; }
+        @media (max-width: 768px) {
+            .blog-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .blog-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
     </style>
 </head>
 <body style="background: var(--cream);">
@@ -50,7 +56,7 @@ function excerpt(body: string, length = 110) {
 
     <main style="max-width: 1160px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem;">
         {posts.length > 0 ? (
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            <div class="blog-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
                 {posts.map((post: any, i: number) => (
                     <a href={`/blog/${post.slug?.current}`} class="blog-card" style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(13,40,48,0.05);`}>
                         <div style={`height: 200px; background: var(--primary-light); ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>

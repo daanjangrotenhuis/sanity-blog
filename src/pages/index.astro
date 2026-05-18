@@ -125,6 +125,17 @@ const categories = [
         .cinematic-img { transition: transform 0.6s ease; }
         .lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .lift:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(26,31,30,0.12) !important; }
+
+        @media (max-width: 768px) {
+            .hero-nav { padding: 1.25rem 1.25rem; }
+            .hero-nav-left { display: none; }
+            .hero-ghost { display: none; }
+            .hero-content { padding: 1.5rem 1.25rem 6rem !important; }
+            .feat-content { padding: 1.5rem 1.5rem 1.75rem !important; }
+            .grid-3 { grid-template-columns: 1fr !important; }
+            .grid-2 { grid-template-columns: 1fr !important; gap: 2.5rem !important; }
+            .nl-form { flex-direction: column !important; }
+        }
     </style>
 </head>
 <body style="background: var(--cream);">
@@ -165,7 +176,7 @@ const categories = [
         </nav>
 
         <!-- HERO CONTENT -->
-        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 2rem 2.5rem 7rem; position: relative; z-index: 10;">
+        <div class="hero-content" style="flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 2rem 2.5rem 7rem; position: relative; z-index: 10;">
             <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 1.75rem;">
                 Eerlijke reisgids voor gezinnen
             </p>
@@ -230,7 +241,7 @@ const categories = [
                 <a href={`/blog/${featured.slug?.current}`} class="cinematic" style="display: block; position: relative; border-radius: 16px; overflow: hidden; height: 480px; text-decoration: none; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(26,31,30,0.1);">
                     <div class="cinematic-img" style={`position: absolute; inset: 0; background: #2A4A46; ${featured.imageUrl ? `background-image: url('${featured.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
                     <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,30,28,0.9) 0%, rgba(20,30,28,0.2) 60%, transparent 90%);"></div>
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5rem 3rem;">
+                    <div class="feat-content" style="position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5rem 3rem;">
                         <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem;">{formatDate(featured.publishedAt)}</p>
                         <h3 style="font-family: 'Fraunces', serif; font-size: clamp(1.5rem, 3vw, 2.4rem); font-weight: 700; color: white; line-height: 1.2; max-width: 680px; font-optical-sizing: auto; margin-bottom: 1rem;">
                             {featured.title}
@@ -243,7 +254,7 @@ const categories = [
 
                 <!-- 3 smaller posts below -->
                 {recent.length > 0 && (
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                    <div class="grid-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
                         {recent.map((post: any, i: number) => (
                             <a href={`/blog/${post.slug?.current}`} class={`lift ${i === 0 ? 'card-accent-teal' : i === 1 ? 'card-accent-coral' : 'card-accent-sun'}`} style="display: block; background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(26,31,30,0.05);">
                                 <div style={`height: 170px; background: #2A4A46; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
@@ -263,7 +274,7 @@ const categories = [
     <!-- OVER ONS SNIPPET                              -->
     <!-- ═══════════════════════════════════════════════ -->
     <section style="background: var(--mint); padding: 6rem 1.5rem;"><div style="max-width: 1160px; margin: 0 auto;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;">
+        <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;">
             <div>
                 <p style="font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.75rem;">Over ons</p>
                 <h2 style="font-family: 'Fraunces', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 700; color: var(--dark); line-height: 1.2; margin-bottom: 1.25rem; font-optical-sizing: auto;">
@@ -308,7 +319,7 @@ const categories = [
                     </div>
                     <a href="/blog" style="font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--teal);" onmouseover="this.style.color='var(--teal-dark)'" onmouseout="this.style.color='var(--teal)'">Alles bekijken →</a>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                <div class="grid-3" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
                     {popular.map((post: any, i: number) => (
                         <a href={`/blog/${post.slug?.current}`} class="lift" style="display: block; text-decoration: none; border-radius: 14px; overflow: hidden; position: relative; box-shadow: 0 2px 12px rgba(26,31,30,0.08);">
                             <div style={`height: 260px; background: #2A4A46; ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
@@ -339,7 +350,7 @@ const categories = [
             <p style="font-family: 'Nunito', sans-serif; font-size: 1rem; color: var(--muted); line-height: 1.75; margin-bottom: 2rem;">
                 Schrijf je in en ontvang de beste reistips, vakantieparken en aanbiedingen rechtstreeks in je inbox.
             </p>
-            <form style="display: flex; gap: 0.75rem; max-width: 420px; margin: 0 auto;" onsubmit="return false;">
+            <form class="nl-form" style="display: flex; gap: 0.75rem; max-width: 420px; margin: 0 auto;" onsubmit="return false;">
                 <input type="email" placeholder="jouw@email.nl" style="flex: 1; font-family: 'Nunito', sans-serif; font-size: 0.9rem; padding: 0.8rem 1.1rem; border: 2px solid #F5DFA0; border-radius: 30px; background: white; color: var(--dark); outline: none;" />
                 <button type="submit" style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; font-weight: 700; background: var(--orange); color: var(--dark); padding: 0.8rem 1.4rem; border-radius: 30px; border: none; cursor: pointer; white-space: nowrap; transition: background 0.15s; box-shadow: 0 4px 12px rgba(232,168,32,0.3);" onmouseover="this.style.background='var(--orange-dark)'" onmouseout="this.style.background='var(--orange)'">
                     Inschrijven

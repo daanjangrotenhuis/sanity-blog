@@ -71,6 +71,11 @@ const breadcrumbSchema = {
 <head>
     <BaseHead title={`${post.title} — ${SITE_TITLE}`} description={excerpt(post.body, 160)} schema={[articleSchema, breadcrumbSchema]} />
 </head>
+<style>
+    @media (max-width: 768px) {
+        .related-grid { grid-template-columns: 1fr !important; }
+    }
+</style>
 <body>
     <Header />
 
@@ -122,7 +127,7 @@ const breadcrumbSchema = {
                     <span style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--primary-dark);">Meer lezen</span>
                     <div style="flex: 1; height: 1px; background: var(--border);"></div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                <div class="related-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
                     {related.map((p: any, i: number) => (
                         <a href={`/blog/${p.slug?.current}`} style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i === 0 ? 'var(--primary)' : i === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; overflow: hidden; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;`} onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(13,40,48,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
                             <div style={`height: 140px; background: var(--primary-light); ${p.imageUrl ? `background-image: url('${p.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
