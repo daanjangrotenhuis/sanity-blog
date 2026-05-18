@@ -79,14 +79,12 @@ const breadcrumbSchema = {
 <body>
     <Header />
 
-    <!-- ARTICLE HERO -->
     {post.imageUrl && (
         <div style={`width: 100%; height: 480px; background: #C8DFDB; background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;`}></div>
     )}
 
     <main style="max-width: 740px; margin: 0 auto; padding: 3rem 1.5rem;">
 
-        <!-- BREADCRUMB -->
         <nav aria-label="Breadcrumb" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted-light); margin-bottom: 2rem; flex-wrap: wrap;">
             <a href="/" style="color: var(--muted-light); transition: color 0.15s;" onmouseover="this.style.color='var(--dark)'" onmouseout="this.style.color='var(--muted-light)'">Home</a>
             <span>/</span>
@@ -96,7 +94,6 @@ const breadcrumbSchema = {
         </nav>
 
         <article>
-            <!-- META -->
             <div style="margin-bottom: 1.75rem;">
                 <p style="font-size: 0.8rem; color: var(--muted-light); margin-bottom: 1rem;">
                     {formatDate(post.publishedAt)} &middot; {readingTime(post.body)} min leestijd
@@ -119,7 +116,6 @@ const breadcrumbSchema = {
 
     </main>
 
-    <!-- RELATED -->
     {related.length > 0 && (
         <section style="background: var(--primary-light); border-top: 1px solid var(--border); padding: 4rem 1.5rem; margin-top: 3rem;">
             <div style="max-width: 1140px; margin: 0 auto;">
