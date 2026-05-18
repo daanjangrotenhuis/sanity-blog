@@ -1,0 +1,43 @@
+import type { APIRoute } from 'astro';
+import { sanityClient } from 'sanity:client';
+
+const SITE = 'https://www.vakantievoorkids.nl';
+
+const staticPages = [
+    { url: `${SITE}/`, priority: '1.0', changefreq: 'daily' },
+    { url: `${SITE}/blog`, priority: '0.9', changefreq: 'daily' },
+    { url: `${SITE}/about`, priority: '0.6', changefreq: 'monthly' },
+];
+
+export const GET: APIRoute = async () => {
+    const posts = await sanityClient.fetch<{ slug: { current: string }; publishedAt: string }[]>(`
+        *[_type == "post"] | order(publishedAt desc) {
+            slug, publishedAt
+        }
+    `);
+
+    const postEntries = posts.map(post => ({
+        url: `${SITE}/blog/${post.slug.current}`,
+        lastmod: post.publishedAt ? post.publishedAt.slice(0, 10) : undefined,
+        priority: '0.8',
+        changefreq: 'weekly',
+    }));
+
+    const allEntries = [...staticPages, ...postEntries];
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allEntries.map(entry => `  <url>
+    <loc>${entry.url}</loc>${entry.lastmod ? `\n    <lastmod>${entry.lastmod}</lastmod>` : ''}
+    <changefreq>${entry.changefreq}</changefreq>
+    <priority>${entry.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+    return new Response(xml, {
+        headers: {
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600',
+        },
+    });
+};
