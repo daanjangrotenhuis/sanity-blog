@@ -2,10 +2,24 @@
 const today = new Date();
 ---
 
+<style>
+    @media (max-width: 640px) {
+        .footer-grid {
+            grid-template-columns: 1fr !important;
+            gap: 2rem !important;
+        }
+        .footer-bottom {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+        }
+    }
+</style>
+
 <footer style="background: var(--dark); color: #8AABA6; margin-top: 6rem;">
     <div style="max-width: 1140px; margin: 0 auto; padding: 4rem 1.5rem 2.5rem;">
 
-        <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; padding-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.07);">
+        <div class="footer-grid" style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; padding-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.07);">
 
             <div>
                 <div style="font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 700; color: white; margin-bottom: 0.3rem;">Vakantie voor Kids</div>
@@ -35,7 +49,7 @@ const today = new Date();
 
         </div>
 
-        <div style="padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div class="footer-bottom" style="padding-top: 1.75rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <p style="font-size: 0.8rem; margin: 0; color: #8AABA6;">&copy; {today.getFullYear()} Vakantie voor Kids. Alle rechten voorbehouden.</p>
             <div style="display: flex; gap: 1.5rem;">
                 <a href="#" style="font-size: 0.8rem; color: #8AABA6;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#8AABA6'">Privacy</a>
