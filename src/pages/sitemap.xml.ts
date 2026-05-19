@@ -6,6 +6,22 @@ const SITE = 'https://www.vakantievoorkids.nl';
 const staticPages = [
     { url: `${SITE}/`, priority: '1.0', changefreq: 'daily' },
     { url: `${SITE}/blog`, priority: '0.9', changefreq: 'daily' },
+    { url: `${SITE}/vakantie-met-kids`, priority: '0.85', changefreq: 'weekly' },
+    { url: `${SITE}/bestemmingen`, priority: '0.85', changefreq: 'weekly' },
+    { url: `${SITE}/bestemmingen/vakantie-nederland-met-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/bestemmingen/vakantie-belgie-met-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/bestemmingen/vakantie-duitsland-met-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/bestemmingen/vakantie-oostenrijk-met-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/overnachten`, priority: '0.85', changefreq: 'weekly' },
+    { url: `${SITE}/overnachten/vakantiepark-voor-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/overnachten/midweek-weg-met-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/overnachten/weekend-weg-met-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/overnachten/campings-voor-kids`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/uitjes`, priority: '0.85', changefreq: 'weekly' },
+    { url: `${SITE}/uitjes/kindvriendelijke-restaurants`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/uitjes/kindvriendelijk-musea`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/uitjes/binnenspeeltijd`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/uitjes/zwemparadijs`, priority: '0.8', changefreq: 'weekly' },
     { url: `${SITE}/about`, priority: '0.6', changefreq: 'monthly' },
 ];
 

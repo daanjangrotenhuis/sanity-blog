@@ -1,0 +1,48 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PillarPageLayout from '../../components/PillarPageLayout.astro';
+import { SITE_TITLE } from '../../consts';
+import { categoryGroups } from '../../data/categories';
+import { sanityClient } from 'sanity:client';
+
+const group = categoryGroups.find(g => g.slug === 'overnachten')!;
+const allValues = group.subcategories.map(s => s.sanityValue);
+
+const [pillar, posts] = await Promise.all([
+    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == "overnachten"][0]{ title, label, intro, content, metaDescription }`),
+    sanityClient.fetch(`*[_type == "post" && count(categories[@ in $vals]) > 0] | order(publishedAt desc) { title, slug, publishedAt, body, imageUrl }`, { vals: allValues }),
+]);
+
+const title = pillar?.title ?? 'Overnachten met kids';
+const label = pillar?.label ?? 'Vakantie voor Kids';
+const intro = pillar?.intro ?? 'Waar slaap je met de kids? Van vakantieparken tot campings — vind de perfecte plek voor het hele gezin.';
+const metaDescription = pillar?.metaDescription ?? intro;
+
+const subcategories = group.subcategories.map(sub => ({
+    slug: sub.slug,
+    title: sub.title,
+    description: sub.description,
+    href: `/overnachten/${sub.slug}`,
+}));
+---
+
+<!doctype html>
+<html lang="nl">
+<head>
+    <BaseHead title={`${title} — ${SITE_TITLE}`} description={metaDescription} />
+</head>
+<body style="background: var(--cream);">
+    <Header />
+    <PillarPageLayout
+        title={title}
+        label={label}
+        intro={intro}
+        pillarContent={pillar?.content}
+        subcategories={subcategories}
+        posts={posts}
+    />
+    <Footer />
+</body>
+</html>

@@ -1,0 +1,36 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PillarPageLayout from '../components/PillarPageLayout.astro';
+import { SITE_TITLE } from '../consts';
+import { sanityClient } from 'sanity:client';
+
+const [pillar, posts] = await Promise.all([
+    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == "vakantie-met-kids"][0]{ title, label, intro, content, metaDescription }`),
+    sanityClient.fetch(`*[_type == "post" && 'vakantie-met-kids' in categories] | order(publishedAt desc) { title, slug, publishedAt, body, imageUrl }`),
+]);
+
+const title = pillar?.title ?? 'Vakantie met kids';
+const label = pillar?.label ?? 'Vakantie voor Kids';
+const intro = pillar?.intro ?? 'Alles over vakantie met kinderen. Van tips voor de reis tot de leukste bestemmingen in binnen- en buitenland.';
+const metaDescription = pillar?.metaDescription ?? intro;
+---
+
+<!doctype html>
+<html lang="nl">
+<head>
+    <BaseHead title={`${title} — ${SITE_TITLE}`} description={metaDescription} />
+</head>
+<body style="background: var(--cream);">
+    <Header />
+    <PillarPageLayout
+        title={title}
+        label={label}
+        intro={intro}
+        pillarContent={pillar?.content}
+        posts={posts}
+    />
+    <Footer />
+</body>
+</html>

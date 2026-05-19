@@ -1,0 +1,71 @@
+---
+interface Props {
+    title: string;
+    label: string;
+    intro: string;
+    posts: any[];
+    breadcrumb?: { label: string; href: string };
+}
+
+const { title, label, intro, posts, breadcrumb } = Astro.props;
+
+function formatDate(dateStr: string) {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function excerpt(body: string, length = 110) {
+    if (!body) return '';
+    const plain = body.replace(/<[^>]+>/g, '');
+    return plain.length > length ? plain.slice(0, length).trimEnd() + '…' : plain;
+}
+---
+
+<style>
+    .cat-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
+    .cat-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,40,48,0.12) !important; }
+    @media (max-width: 768px) {
+        .posts-grid { grid-template-columns: 1fr !important; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .posts-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+</style>
+
+<section style="background: var(--dark); padding: 3.5rem 2rem 3rem;">
+    <div style="max-width: 1160px; margin: 0 auto;">
+        {breadcrumb && (
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 0.75rem;">
+                <a href={breadcrumb.href} style="color: rgba(255,255,255,0.35); text-decoration: none;">{breadcrumb.label}</a>
+                {' / '}
+                <span style="color: rgba(255,255,255,0.55);">{title}</span>
+            </p>
+        )}
+        <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem;">{label}</p>
+        <h1 style="font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; color: white; margin-bottom: 1rem; font-optical-sizing: auto;">{title}</h1>
+        <p style="font-family: 'Nunito', sans-serif; font-size: 1rem; color: rgba(255,255,255,0.5); max-width: 640px; line-height: 1.75; margin: 0;">{intro}</p>
+    </div>
+</section>
+
+<main style="max-width: 1160px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem;">
+    {posts.length > 0 ? (
+        <div class="posts-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            {posts.map((post: any, i: number) => (
+                <a href={`/blog/${post.slug?.current}`} class="cat-card" style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(13,40,48,0.05);`}>
+                    <div style={`height: 200px; background: var(--primary-light); ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
+                    <div style="padding: 1.25rem 1.5rem 1.6rem;">
+                        <p style="font-family: 'Nunito', sans-serif; font-size: 0.75rem; color: var(--muted-light); margin-bottom: 0.5rem;">{formatDate(post.publishedAt)}</p>
+                        <h2 style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); line-height: 1.35; margin-bottom: 0.6rem; font-optical-sizing: auto;">{post.title}</h2>
+                        <p style="font-family: 'Nunito', sans-serif; font-size: 0.875rem; color: var(--muted); line-height: 1.65; margin: 0;">{excerpt(post.body)}</p>
+                    </div>
+                </a>
+            ))}
+        </div>
+    ) : (
+        <div style="text-align: center; padding: 5rem 0;">
+            <p style="font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 0.75rem; font-optical-sizing: auto;">Binnenkort hier te lezen</p>
+            <p style="font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: var(--muted); margin-bottom: 2rem;">We werken aan nieuwe blogs voor deze categorie.</p>
+            <a href="/blog" style="font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem; background: var(--orange); color: var(--dark); padding: 0.75rem 1.5rem; border-radius: 30px; text-decoration: none;">Bekijk alle blogs →</a>
+        </div>
+    )}
+</main>
