@@ -81,9 +81,6 @@ const currentPath = Astro.url.pathname;
             {[['/', 'Home'], ['/blog', 'Blogs'], ['/about', 'Over ons']].map(([href, label]) => (
                 <a href={href} class={`header-nav-link${currentPath === href ? ' active' : ''}`}>{label}</a>
             ))}
-            <a href="/blog" style="font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700; background: var(--orange); color: var(--dark); padding: 0.45rem 1.1rem; border-radius: 30px; text-decoration: none; margin-left: 0.5rem; transition: background 0.15s;" onmouseover="this.style.background='var(--orange-dark)'" onmouseout="this.style.background='var(--orange)'">
-                Alle blogs
-            </a>
         </nav>
 
         <button class="menu-toggle" id="menuToggle" aria-label="Menu openen">
