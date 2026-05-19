@@ -3,14 +3,13 @@ interface Props {
     title: string;
     label: string;
     intro: string;
-    pillarContent?: any[];
+    pillarContent?: string;
     subcategories?: { slug: string; title: string; description: string; href: string }[];
     posts: any[];
     breadcrumb?: { label: string; href: string };
-    groupSlug?: string;
 }
 
-const { title, label, intro, pillarContent, subcategories, posts, breadcrumb, groupSlug } = Astro.props;
+const { title, label, intro, pillarContent, subcategories, posts, breadcrumb } = Astro.props;
 
 function formatDate(dateStr: string) {
     if (!dateStr) return '';
@@ -22,34 +21,6 @@ function excerpt(body: string, length = 110) {
     const plain = body.replace(/<[^>]+>/g, '');
     return plain.length > length ? plain.slice(0, length).trimEnd() + '…' : plain;
 }
-
-function renderPT(blocks: any[]): string {
-    if (!Array.isArray(blocks) || blocks.length === 0) return '';
-    return blocks.map(block => {
-        if (block._type !== 'block') return '';
-        const text = (block.children || []).map((child: any) => {
-            let t = (child.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-            if (child.marks?.includes('strong')) t = `<strong>${t}</strong>`;
-            if (child.marks?.includes('em')) t = `<em>${t}</em>`;
-            // handle link marks
-            const linkMark = (child.marks || []).find((m: string) => typeof m === 'string' && m.length > 10);
-            if (linkMark && block.markDefs) {
-                const def = block.markDefs.find((d: any) => d._key === linkMark);
-                if (def?.href) t = `<a href="${def.href}">${t}</a>`;
-            }
-            return t;
-        }).join('');
-        switch (block.style) {
-            case 'h2': return `<h2>${text}</h2>`;
-            case 'h3': return `<h3>${text}</h3>`;
-            case 'h4': return `<h4>${text}</h4>`;
-            case 'blockquote': return `<blockquote>${text}</blockquote>`;
-            default: return text ? `<p>${text}</p>` : '';
-        }
-    }).join('\n');
-}
-
-const pillarHtml = pillarContent ? renderPT(pillarContent) : '';
 ---
 
 <style>
@@ -136,8 +107,8 @@ const pillarHtml = pillarContent ? renderPT(pillarContent) : '';
 
 <main style="max-width: 1160px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem;">
 
-    {pillarHtml && (
-        <article class="pillar-body" style="max-width: 780px; margin: 0 auto 4rem;" set:html={pillarHtml} />
+    {pillarContent && (
+        <article class="pillar-body" style="max-width: 780px; margin: 0 auto 4rem;" set:html={pillarContent} />
     )}
 
     {subcategories && subcategories.length > 0 && (
@@ -173,7 +144,7 @@ const pillarHtml = pillarContent ? renderPT(pillarContent) : '';
         </div>
     )}
 
-    {posts.length === 0 && !pillarHtml && (
+    {posts.length === 0 && !pillarContent && (
         <div style="text-align: center; padding: 5rem 0;">
             <p style="font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 0.75rem; font-optical-sizing: auto;">Binnenkort hier te lezen</p>
             <p style="font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: var(--muted); margin-bottom: 2rem;">We werken aan nieuwe blogs voor deze categorie.</p>

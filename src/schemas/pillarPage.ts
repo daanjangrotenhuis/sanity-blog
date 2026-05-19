@@ -32,37 +32,11 @@ export default defineType({
             rows: 3,
         }),
         defineField({
-            name: 'content',
-            title: 'Pillar content (minimaal 1500 woorden)',
-            type: 'array',
-            of: [
-                {
-                    type: 'block',
-                    styles: [
-                        { title: 'Normaal', value: 'normal' },
-                        { title: 'H2', value: 'h2' },
-                        { title: 'H3', value: 'h3' },
-                        { title: 'H4', value: 'h4' },
-                        { title: 'Quote', value: 'blockquote' },
-                    ],
-                    marks: {
-                        decorators: [
-                            { title: 'Vet', value: 'strong' },
-                            { title: 'Cursief', value: 'em' },
-                        ],
-                        annotations: [
-                            {
-                                name: 'link',
-                                type: 'object',
-                                title: 'Link',
-                                fields: [
-                                    { name: 'href', type: 'url', title: 'URL' },
-                                ],
-                            },
-                        ],
-                    },
-                },
-            ],
+            name: 'contentHtml',
+            title: 'Pillar content HTML (minimaal 1500 woorden)',
+            description: 'Plak hier de HTML die door AI is gegenereerd. Gebruik <h2>, <h3>, <p>, <strong> tags.',
+            type: 'text',
+            rows: 30,
         }),
         defineField({
             name: 'metaDescription',

@@ -12,7 +12,7 @@ const category = findSubcategory('overnachten', slug!);
 if (!category) return Astro.redirect('/overnachten');
 
 const [pillar, posts] = await Promise.all([
-    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == $slug][0]{ title, label, intro, content, metaDescription }`, { slug }),
+    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == $slug][0]{ title, label, intro, contentHtml, metaDescription }`, { slug }),
     sanityClient.fetch(`*[_type == "post" && $cat in categories] | order(publishedAt desc) { title, slug, publishedAt, body, imageUrl }`, { cat: category.sanityValue }),
 ]);
 

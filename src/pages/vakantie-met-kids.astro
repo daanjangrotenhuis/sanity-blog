@@ -7,7 +7,7 @@ import { SITE_TITLE } from '../consts';
 import { sanityClient } from 'sanity:client';
 
 const [pillar, posts] = await Promise.all([
-    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == "vakantie-met-kids"][0]{ title, label, intro, content, metaDescription }`),
+    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == "vakantie-met-kids"][0]{ title, label, intro, contentHtml, metaDescription }`),
     sanityClient.fetch(`*[_type == "post" && 'vakantie-met-kids' in categories] | order(publishedAt desc) { title, slug, publishedAt, body, imageUrl }`),
 ]);
 
