@@ -3,20 +3,21 @@ interface Props {
     title: string;
     label: string;
     intro: string;
+    heroImageUrl?: string;
     pillarContent?: string;
     subcategories?: { slug: string; title: string; description: string; href: string }[];
     posts: any[];
     breadcrumb?: { label: string; href: string };
 }
 
-const { title, label, intro, pillarContent, subcategories, posts, breadcrumb } = Astro.props;
+const { title, label, intro, heroImageUrl, pillarContent, subcategories, posts, breadcrumb } = Astro.props;
 
 function formatDate(dateStr: string) {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function excerpt(body: string, length = 110) {
+function excerpt(body: string, length = 115) {
     if (!body) return '';
     const plain = body.replace(/<[^>]+>/g, '');
     return plain.length > length ? plain.slice(0, length).trimEnd() + '…' : plain;
@@ -24,12 +25,53 @@ function excerpt(body: string, length = 110) {
 ---
 
 <style>
+    /* Hero */
+    .pillar-hero {
+        position: relative;
+        min-height: 480px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        overflow: hidden;
+        background: var(--dark);
+    }
+    .pillar-hero-img {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        transition: transform 0.6s ease;
+    }
+    .pillar-hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(170deg, rgba(13,40,48,0.45) 0%, rgba(13,40,48,0.75) 100%);
+    }
+    .pillar-hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 3rem 2rem 4rem;
+        width: 100%;
+    }
+    .pillar-hero-wave {
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        z-index: 3;
+        line-height: 0;
+    }
+
+    /* Article prose */
+    .pillar-body { max-width: 760px; margin: 0 auto; }
     .pillar-body h2 {
         font-family: 'Fraunces', serif;
         font-size: 1.55rem;
         font-weight: 700;
         color: var(--dark);
-        margin: 2.5rem 0 0.9rem;
+        margin: 2.75rem 0 0.9rem;
         line-height: 1.25;
         font-optical-sizing: auto;
     }
@@ -52,103 +94,133 @@ function excerpt(body: string, length = 110) {
         font-family: 'Nunito', sans-serif;
         font-size: 1rem;
         color: var(--muted);
-        line-height: 1.85;
+        line-height: 1.88;
         margin: 0 0 1.1rem;
     }
     .pillar-body strong { color: var(--dark); }
     .pillar-body blockquote {
         border-left: 3px solid var(--primary);
-        margin: 1.5rem 0;
-        padding: 0.75rem 1.25rem;
+        margin: 1.75rem 0;
+        padding: 0.85rem 1.35rem;
         background: var(--primary-light);
-        border-radius: 0 8px 8px 0;
+        border-radius: 0 10px 10px 0;
         font-family: 'Nunito', sans-serif;
         font-size: 1rem;
         color: var(--dark);
-        line-height: 1.7;
+        line-height: 1.75;
     }
-    .pillar-body a {
-        color: var(--primary-dark);
-        text-decoration: underline;
-        text-underline-offset: 3px;
-    }
+    .pillar-body a { color: var(--primary-dark); text-decoration: underline; text-underline-offset: 3px; }
     .pillar-body a:hover { color: var(--primary); }
 
-    .cat-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
-    .cat-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,40,48,0.12) !important; }
-
+    /* Cards */
+    .sub-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
+    .sub-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,40,48,0.12) !important; }
     .post-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
     .post-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(13,40,48,0.12) !important; }
 
+    /* Responsive */
     @media (max-width: 768px) {
+        .pillar-hero { min-height: 340px; }
+        .pillar-hero-content { padding: 2rem 1.25rem 3rem; }
         .posts-grid { grid-template-columns: 1fr !important; }
-        .sub-grid { grid-template-columns: 1fr !important; }
+        .sub-grid  { grid-template-columns: 1fr !important; }
+        .pillar-body h2 { font-size: 1.3rem; }
     }
     @media (min-width: 769px) and (max-width: 1024px) {
         .posts-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        .sub-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        .sub-grid  { grid-template-columns: repeat(2, 1fr) !important; }
     }
 </style>
 
-<section style="background: var(--dark); padding: 3.5rem 2rem 3rem;">
-    <div style="max-width: 1160px; margin: 0 auto;">
+<!-- HERO -->
+<div class="pillar-hero">
+    <div class="pillar-hero-img" style={heroImageUrl ? `background-image: url('${heroImageUrl}');` : 'background: var(--dark);'}></div>
+    <div class="pillar-hero-overlay"></div>
+
+    <div class="pillar-hero-content">
         {breadcrumb && (
-            <p style="font-family: 'Nunito', sans-serif; font-size: 0.78rem; color: rgba(255,255,255,0.35); margin-bottom: 0.75rem;">
-                <a href={breadcrumb.href} style="color: rgba(255,255,255,0.35); text-decoration: none;">{breadcrumb.label}</a>
-                {' / '}
-                <span style="color: rgba(255,255,255,0.55);">{title}</span>
+            <p style="font-family:'Nunito',sans-serif; font-size:0.78rem; color:rgba(255,255,255,0.4); margin-bottom:0.75rem;">
+                <a href={breadcrumb.href} style="color:rgba(255,255,255,0.4); text-decoration:none;">{breadcrumb.label}</a>
+                {' / '}<span style="color:rgba(255,255,255,0.6);">{title}</span>
             </p>
         )}
-        <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.75rem;">{label}</p>
-        <h1 style="font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; color: white; margin-bottom: 1rem; font-optical-sizing: auto;">{title}</h1>
-        <p style="font-family: 'Nunito', sans-serif; font-size: 1rem; color: rgba(255,255,255,0.5); max-width: 640px; line-height: 1.75; margin: 0;">{intro}</p>
+        <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--yellow); margin-bottom:0.75rem;">{label}</p>
+        <h1 style="font-family:'Fraunces',serif; font-size:clamp(2.2rem,5vw,3.4rem); font-weight:700; color:white; line-height:1.1; margin-bottom:1.1rem; font-optical-sizing:auto; max-width:720px;">{title}</h1>
+        <p style="font-family:'Nunito',sans-serif; font-size:1.05rem; color:rgba(255,255,255,0.65); max-width:580px; line-height:1.75; margin:0 0 1.75rem;">{intro}</p>
+        {posts.length > 0 && (
+            <a href="#blogs" style="font-family:'Nunito',sans-serif; font-size:0.875rem; font-weight:700; background:var(--orange); color:var(--dark); padding:0.7rem 1.5rem; border-radius:30px; text-decoration:none; display:inline-block; box-shadow:0 4px 16px rgba(232,168,32,0.35);">
+                Bekijk {posts.length} blog{posts.length !== 1 ? 's' : ''} →
+            </a>
+        )}
     </div>
-</section>
 
-<main style="max-width: 1160px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem;">
+    <div class="pillar-hero-wave">
+        <svg viewBox="0 0 1440 70" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block; width:100%; height:70px;">
+            <path d="M0,0 C360,65 720,5 1080,50 C1260,65 1380,15 1440,0 L1440,70 L0,70 Z" fill="#F7FDFC"/>
+        </svg>
+    </div>
+</div>
 
-    {pillarContent && (
-        <article class="pillar-body" style="max-width: 780px; margin: 0 auto 4rem;" set:html={pillarContent} />
-    )}
+<!-- PILLAR CONTENT -->
+{pillarContent && (
+    <section style="background:var(--cream); padding:4rem 1.5rem 3rem;">
+        <article class="pillar-body" set:html={pillarContent} />
+    </section>
+)}
 
-    {subcategories && subcategories.length > 0 && (
-        <div style="margin-bottom: 4rem;">
-            <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary); margin-bottom: 1.5rem;">Bekijk per categorie</p>
-            <div class="sub-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+<!-- SUBCATEGORY CARDS -->
+{subcategories && subcategories.length > 0 && (
+    <section style="background:var(--white); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:4rem 1.5rem;">
+        <div style="max-width:1160px; margin:0 auto;">
+            <div style="margin-bottom:2rem;">
+                <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--primary); margin-bottom:0.5rem;">Categorieën</p>
+                <h2 style="font-family:'Fraunces',serif; font-size:clamp(1.6rem,3vw,2.2rem); font-weight:700; color:var(--dark); font-optical-sizing:auto;">Bekijk per categorie</h2>
+            </div>
+            <div class="sub-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem;">
                 {subcategories.map((sub, i) => (
-                    <a href={sub.href} class="cat-card" style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; padding: 1.5rem; text-decoration: none;`}>
-                        <h2 style="font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; font-optical-sizing: auto;">{sub.title}</h2>
-                        <p style="font-family: 'Nunito', sans-serif; font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin: 0 0 1rem;">{sub.description}</p>
-                        <span style="font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700; color: var(--primary);">Lees meer →</span>
+                    <a href={sub.href} class="sub-card" style={`display:flex; flex-direction:column; background:var(--cream); border:1.5px solid var(--border); border-top:3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius:14px; padding:1.75rem; text-decoration:none;`}>
+                        <h3 style="font-family:'Fraunces',serif; font-size:1.1rem; font-weight:700; color:var(--dark); margin-bottom:0.5rem; font-optical-sizing:auto;">{sub.title}</h3>
+                        <p style="font-family:'Nunito',sans-serif; font-size:0.875rem; color:var(--muted); line-height:1.65; margin:0 0 1.25rem; flex:1;">{sub.description}</p>
+                        <span style="font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:700; color:var(--primary);">Lees meer →</span>
                     </a>
                 ))}
             </div>
         </div>
-    )}
+    </section>
+)}
 
-    {posts.length > 0 && (
-        <div>
-            <p style="font-family: 'Nunito', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--primary); margin-bottom: 1.5rem;">Gerelateerde blogs</p>
-            <div class="posts-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+<!-- BLOG POSTS -->
+{posts.length > 0 && (
+    <section id="blogs" style="background:var(--cream); padding:4.5rem 1.5rem 5rem;">
+        <div style="max-width:1160px; margin:0 auto;">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+                <div>
+                    <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--primary); margin-bottom:0.5rem;">Blogs</p>
+                    <h2 style="font-family:'Fraunces',serif; font-size:clamp(1.6rem,3vw,2.2rem); font-weight:700; color:var(--dark); font-optical-sizing:auto;">Alle blogs over {title.toLowerCase()}</h2>
+                </div>
+                <a href="/blog" style="font-family:'Nunito',sans-serif; font-size:0.85rem; font-weight:700; color:var(--primary);">Alle blogs →</a>
+            </div>
+            <div class="posts-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;">
                 {posts.map((post: any, i: number) => (
-                    <a href={`/blog/${post.slug?.current}`} class="post-card" style={`display: block; background: var(--white); border: 1.5px solid var(--border); border-top: 3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(13,40,48,0.05);`}>
-                        <div style={`height: 190px; background: var(--primary-light); ${post.imageUrl ? `background-image: url('${post.imageUrl}'); background-size: cover; background-position: center;` : ''}`}></div>
-                        <div style="padding: 1.2rem 1.4rem 1.5rem;">
-                            <p style="font-family: 'Nunito', sans-serif; font-size: 0.72rem; color: var(--muted-light); margin-bottom: 0.45rem;">{formatDate(post.publishedAt)}</p>
-                            <h2 style="font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: var(--dark); line-height: 1.3; margin-bottom: 0.5rem; font-optical-sizing: auto;">{post.title}</h2>
-                            <p style="font-family: 'Nunito', sans-serif; font-size: 0.85rem; color: var(--muted); line-height: 1.65; margin: 0;">{excerpt(post.body)}</p>
+                    <a href={`/blog/${post.slug?.current}`} class="post-card" style={`display:block; background:var(--white); border:1.5px solid var(--border); border-top:3px solid ${i % 3 === 0 ? 'var(--primary)' : i % 3 === 1 ? 'var(--orange)' : 'var(--yellow)'}; border-radius:14px; overflow:hidden; text-decoration:none; box-shadow:0 2px 8px rgba(13,40,48,0.05);`}>
+                        <div style={`height:200px; background:var(--primary-light); ${post.imageUrl ? `background-image:url('${post.imageUrl}'); background-size:cover; background-position:center;` : ''}`}></div>
+                        <div style="padding:1.25rem 1.5rem 1.6rem;">
+                            <p style="font-family:'Nunito',sans-serif; font-size:0.72rem; color:var(--muted-light); margin-bottom:0.4rem;">{formatDate(post.publishedAt)}</p>
+                            <h3 style="font-family:'Fraunces',serif; font-size:1.05rem; font-weight:700; color:var(--dark); line-height:1.3; margin-bottom:0.5rem; font-optical-sizing:auto;">{post.title}</h3>
+                            <p style="font-family:'Nunito',sans-serif; font-size:0.875rem; color:var(--muted); line-height:1.65; margin:0;">{excerpt(post.body)}</p>
                         </div>
                     </a>
                 ))}
             </div>
         </div>
-    )}
+    </section>
+)}
 
-    {posts.length === 0 && !pillarContent && (
-        <div style="text-align: center; padding: 5rem 0;">
-            <p style="font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--dark); margin-bottom: 0.75rem; font-optical-sizing: auto;">Binnenkort hier te lezen</p>
-            <p style="font-family: 'Nunito', sans-serif; font-size: 0.95rem; color: var(--muted); margin-bottom: 2rem;">We werken aan nieuwe blogs voor deze categorie.</p>
-            <a href="/blog" style="font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem; background: var(--orange); color: var(--dark); padding: 0.75rem 1.5rem; border-radius: 30px; text-decoration: none;">Bekijk alle blogs →</a>
-        </div>
-    )}
-</main>
+<!-- EMPTY STATE -->
+{posts.length === 0 && !pillarContent && (
+    <section style="background:var(--cream); padding:6rem 1.5rem; text-align:center;">
+        <p style="font-family:'Fraunces',serif; font-size:1.5rem; color:var(--dark); margin-bottom:0.75rem; font-optical-sizing:auto;">Binnenkort hier te lezen</p>
+        <p style="font-family:'Nunito',sans-serif; font-size:0.95rem; color:var(--muted); margin-bottom:2rem;">We werken aan nieuwe blogs voor deze categorie.</p>
+        <a href="/blog" style="font-family:'Nunito',sans-serif; font-weight:700; font-size:0.9rem; background:var(--orange); color:var(--dark); padding:0.75rem 1.5rem; border-radius:30px; text-decoration:none;">Bekijk alle blogs →</a>
+    </section>
+)}

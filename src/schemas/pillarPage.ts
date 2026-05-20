@@ -32,6 +32,12 @@ export default defineType({
             rows: 3,
         }),
         defineField({
+            name: 'heroImageUrl',
+            title: 'Hero afbeelding URL',
+            type: 'url',
+            description: 'Achtergrondafbeelding voor de hero sectie',
+        }),
+        defineField({
             name: 'contentHtml',
             title: 'Pillar content HTML (minimaal 1500 woorden)',
             description: 'Plak hier de HTML die door AI is gegenereerd. Gebruik <h2>, <h3>, <p>, <strong> tags.',
