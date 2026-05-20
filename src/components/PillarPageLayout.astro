@@ -66,50 +66,63 @@ function excerpt(body: string, length = 115) {
 
     /* Article prose */
     .pillar-body { max-width: 760px; margin: 0 auto; }
+
     .pillar-body h2 {
         font-family: 'Fraunces', serif;
-        font-size: 1.55rem;
+        font-size: clamp(1.6rem, 3vw, 2.1rem);
         font-weight: 700;
         color: var(--dark);
-        margin: 2.75rem 0 0.9rem;
-        line-height: 1.25;
+        margin: 3.5rem 0 1rem;
+        line-height: 1.2;
         font-optical-sizing: auto;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border);
     }
+    .pillar-body h2:first-child { margin-top: 0; }
+
     .pillar-body h3 {
         font-family: 'Fraunces', serif;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: 700;
         color: var(--dark);
-        margin: 2rem 0 0.65rem;
+        margin: 2.5rem 0 0.65rem;
         font-optical-sizing: auto;
+        padding-left: 0.9rem;
+        border-left: 3px solid var(--primary);
     }
     .pillar-body h4 {
         font-family: 'Nunito', sans-serif;
         font-size: 1rem;
         font-weight: 700;
         color: var(--dark);
-        margin: 1.5rem 0 0.5rem;
+        margin: 1.75rem 0 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 0.82rem;
+        color: var(--primary-dark);
     }
     .pillar-body p {
         font-family: 'Nunito', sans-serif;
-        font-size: 1rem;
+        font-size: 1.025rem;
         color: var(--muted);
-        line-height: 1.88;
-        margin: 0 0 1.1rem;
+        line-height: 1.9;
+        margin: 0 0 1.25rem;
     }
-    .pillar-body strong { color: var(--dark); }
+    .pillar-body strong { color: var(--dark); font-weight: 700; }
     .pillar-body blockquote {
-        border-left: 3px solid var(--primary);
-        margin: 1.75rem 0;
-        padding: 0.85rem 1.35rem;
+        border-left: 4px solid var(--primary);
+        margin: 2rem 0;
+        padding: 1rem 1.5rem;
         background: var(--primary-light);
-        border-radius: 0 10px 10px 0;
-        font-family: 'Nunito', sans-serif;
-        font-size: 1rem;
+        border-radius: 0 12px 12px 0;
+        font-family: 'Fraunces', serif;
+        font-size: 1.1rem;
+        font-style: italic;
         color: var(--dark);
-        line-height: 1.75;
+        line-height: 1.7;
+        font-optical-sizing: auto;
     }
-    .pillar-body a { color: var(--primary-dark); text-decoration: underline; text-underline-offset: 3px; }
+    .pillar-body a { color: var(--primary-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
     .pillar-body a:hover { color: var(--primary); }
 
     /* Cards */
@@ -163,8 +176,10 @@ function excerpt(body: string, length = 115) {
 
 <!-- PILLAR CONTENT -->
 {pillarContent && (
-    <section style="background:var(--cream); padding:4rem 1.5rem 3rem;">
-        <article class="pillar-body" set:html={pillarContent} />
+    <section style="background: var(--cream); padding: 4rem 1.5rem 4.5rem;">
+        <div style="max-width: 860px; margin: 0 auto; background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 4rem); box-shadow: 0 4px 24px rgba(13,40,48,0.06);">
+            <article class="pillar-body" set:html={pillarContent} />
+        </div>
     </section>
 )}
 
