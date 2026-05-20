@@ -64,12 +64,12 @@ function excerpt(body: string, length = 115) {
         line-height: 0;
     }
 
-    /* Article prose */
-    .pillar-body { max-width: 760px; margin: 0 auto; }
+    /* Article prose — all global so set:html content is styled */
+    :global(.pillar-body) { max-width: 760px; margin: 0 auto; }
 
-    .pillar-body h2 {
+    :global(.pillar-body h2) {
         font-family: 'Fraunces', serif;
-        font-size: clamp(1.6rem, 3vw, 2.1rem);
+        font-size: clamp(1.65rem, 3vw, 2.1rem);
         font-weight: 700;
         color: var(--dark);
         margin: 3.5rem 0 1rem;
@@ -78,9 +78,9 @@ function excerpt(body: string, length = 115) {
         padding-bottom: 0.75rem;
         border-bottom: 2px solid var(--border);
     }
-    .pillar-body h2:first-child { margin-top: 0; }
+    :global(.pillar-body h2:first-child) { margin-top: 0; }
 
-    .pillar-body h3 {
+    :global(.pillar-body h3) {
         font-family: 'Fraunces', serif;
         font-size: 1.3rem;
         font-weight: 700;
@@ -90,26 +90,24 @@ function excerpt(body: string, length = 115) {
         padding-left: 0.9rem;
         border-left: 3px solid var(--primary);
     }
-    .pillar-body h4 {
+    :global(.pillar-body h4) {
         font-family: 'Nunito', sans-serif;
-        font-size: 1rem;
         font-weight: 700;
-        color: var(--dark);
+        color: var(--primary-dark);
         margin: 1.75rem 0 0.5rem;
         text-transform: uppercase;
         letter-spacing: 0.06em;
         font-size: 0.82rem;
-        color: var(--primary-dark);
     }
-    .pillar-body p {
+    :global(.pillar-body p) {
         font-family: 'Nunito', sans-serif;
         font-size: 1.025rem;
         color: var(--muted);
         line-height: 1.9;
         margin: 0 0 1.25rem;
     }
-    .pillar-body strong { color: var(--dark); font-weight: 700; }
-    .pillar-body blockquote {
+    :global(.pillar-body strong) { color: var(--dark); font-weight: 700; }
+    :global(.pillar-body blockquote) {
         border-left: 4px solid var(--primary);
         margin: 2rem 0;
         padding: 1rem 1.5rem;
@@ -122,8 +120,8 @@ function excerpt(body: string, length = 115) {
         line-height: 1.7;
         font-optical-sizing: auto;
     }
-    .pillar-body a { color: var(--primary-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-    .pillar-body a:hover { color: var(--primary); }
+    :global(.pillar-body a) { color: var(--primary-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    :global(.pillar-body a:hover) { color: var(--primary); }
 
     /* Cards */
     .sub-card { transition: transform 0.22s ease, box-shadow 0.22s ease; }
@@ -137,11 +135,13 @@ function excerpt(body: string, length = 115) {
         .pillar-hero-content { padding: 2rem 1.25rem 3rem; }
         .posts-grid { grid-template-columns: 1fr !important; }
         .sub-grid  { grid-template-columns: 1fr !important; }
-        .pillar-body h2 { font-size: 1.3rem; }
+        .pillar-content-grid { grid-template-columns: 1fr !important; }
+        .pillar-aside { display: none !important; }
     }
     @media (min-width: 769px) and (max-width: 1024px) {
         .posts-grid { grid-template-columns: repeat(2, 1fr) !important; }
         .sub-grid  { grid-template-columns: repeat(2, 1fr) !important; }
+        .pillar-content-grid { grid-template-columns: 1fr 240px !important; gap: 2.5rem !important; }
     }
 </style>
 
@@ -176,9 +176,25 @@ function excerpt(body: string, length = 115) {
 
 <!-- PILLAR CONTENT -->
 {pillarContent && (
-    <section style="background: var(--cream); padding: 4rem 1.5rem 4.5rem;">
-        <div style="max-width: 860px; margin: 0 auto; background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 4rem); box-shadow: 0 4px 24px rgba(13,40,48,0.06);">
+    <section style="background: var(--white); border-top: 4px solid var(--primary); border-bottom: 1px solid var(--border);">
+        <div class="pillar-content-grid" style="max-width: 1160px; margin: 0 auto; padding: 4.5rem 1.5rem 5rem; display: grid; grid-template-columns: 1fr 300px; gap: 4rem; align-items: start;">
             <article class="pillar-body" set:html={pillarContent} />
+            <aside class="pillar-aside" style="position: sticky; top: 2rem;">
+                <div style="background: var(--cream); border: 1.5px solid var(--border); border-top: 3px solid var(--orange); border-radius: 14px; padding: 1.5rem;">
+                    <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--orange-dark); margin-bottom:1rem;">In dit artikel</p>
+                    <nav style="display:flex; flex-direction:column; gap:0.1rem;" id="pillar-toc"></nav>
+                </div>
+                {subcategories && subcategories.length > 0 && (
+                    <div style="margin-top:1.25rem; background:var(--primary-light); border:1.5px solid #A8E8E2; border-radius:14px; padding:1.5rem;">
+                        <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary-dark); margin-bottom:1rem;">Categorieën</p>
+                        <div style="display:flex; flex-direction:column; gap:0.35rem;">
+                            {subcategories.map(sub => (
+                                <a href={sub.href} style="font-family:'Nunito',sans-serif; font-size:0.875rem; font-weight:600; color:var(--primary-dark); text-decoration:none; padding:0.4rem 0.6rem; border-radius:8px; transition:background 0.15s;" onmouseover="this.style.background='rgba(0,180,166,0.12)'" onmouseout="this.style.background=''">{sub.title} →</a>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </aside>
         </div>
     </section>
 )}
@@ -239,3 +255,25 @@ function excerpt(body: string, length = 115) {
         <a href="/blog" style="font-family:'Nunito',sans-serif; font-weight:700; font-size:0.9rem; background:var(--orange); color:var(--dark); padding:0.75rem 1.5rem; border-radius:30px; text-decoration:none;">Bekijk alle blogs →</a>
     </section>
 )}
+
+<script>
+    const toc = document.getElementById('pillar-toc');
+    if (toc) {
+        const headings = document.querySelectorAll('.pillar-body h2');
+        headings.forEach((h, i) => {
+            const id = `section-${i}`;
+            h.id = id;
+            const a = document.createElement('a');
+            a.href = `#${id}`;
+            a.textContent = h.textContent || '';
+            a.style.cssText = "font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:600; color:var(--muted); text-decoration:none; padding:0.35rem 0.5rem; border-radius:6px; display:block; transition:color 0.15s, background 0.15s; line-height:1.4;";
+            a.onmouseover = () => { a.style.color = 'var(--dark)'; a.style.background = 'var(--border)'; };
+            a.onmouseout  = () => { a.style.color = 'var(--muted)'; a.style.background = ''; };
+            toc.appendChild(a);
+        });
+        if (headings.length === 0) {
+            const aside = toc.closest('aside');
+            if (aside) (aside as HTMLElement).style.display = 'none';
+        }
+    }
+</script>
