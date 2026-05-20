@@ -12,6 +12,21 @@ interface Props {
 
 const { title, label, intro, heroImageUrl, pillarContent, subcategories, posts, breadcrumb } = Astro.props;
 
+// Split HTML string before the nth H2 (1-indexed). Returns [before, from-nth-h2-onward].
+function splitBeforeH2(html: string, n: number): [string, string] {
+    const pattern = /<h2[\s>]/gi;
+    let count = 0;
+    let match: RegExpExecArray | null;
+    while ((match = pattern.exec(html)) !== null) {
+        count++;
+        if (count === n) return [html.slice(0, match.index), html.slice(match.index)];
+    }
+    return [html, ''];
+}
+
+const [part1, part2rest] = pillarContent ? splitBeforeH2(pillarContent, 3) : ['', ''];
+const [part2, part3]     = part2rest     ? splitBeforeH2(part2rest, 2)     : ['', ''];
+
 function formatDate(dateStr: string) {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -174,14 +189,17 @@ function excerpt(body: string, length = 115) {
     </div>
 </div>
 
-<!-- PILLAR CONTENT -->
+<!-- PILLAR CONTENT: part 1 + 2 (H2 #1 and #2) with sidebar -->
 {pillarContent && (
     <section style="background: var(--white); border-top: 4px solid var(--primary); border-bottom: 1px solid var(--border);">
         <div class="pillar-content-grid" style="max-width: 1160px; margin: 0 auto; padding: 4.5rem 1.5rem 5rem; display: grid; grid-template-columns: 1fr 300px; gap: 4rem; align-items: start;">
-            <article class="pillar-body" set:html={pillarContent} />
+            <div>
+                <article class="pillar-body" set:html={part1} />
+                {part2 && <article class="pillar-body" style="margin-top: 0;" set:html={part2} />}
+            </div>
             <aside class="pillar-aside" style="position: sticky; top: 2rem;">
                 <div style="background: var(--cream); border: 1.5px solid var(--border); border-top: 3px solid var(--orange); border-radius: 14px; padding: 1.5rem;">
-                    <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--orange-dark); margin-bottom:1rem;">In dit artikel</p>
+                    <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--orange-dark); margin-bottom:1rem;">Navigatie</p>
                     <nav style="display:flex; flex-direction:column; gap:0.1rem;" id="pillar-toc"></nav>
                 </div>
                 {subcategories && subcategories.length > 0 && (
@@ -196,6 +214,26 @@ function excerpt(body: string, length = 115) {
                 )}
             </aside>
         </div>
+    </section>
+)}
+
+<!-- ONZE KEUZES -->
+{pillarContent && (
+    <section style="background: var(--sand); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 4rem 1.5rem;">
+        <div style="max-width: 1160px; margin: 0 auto;">
+            <div style="margin-bottom: 2rem;">
+                <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--orange-dark); margin-bottom:0.5rem;">Aanbevolen</p>
+                <h2 id="onze-keuzes" style="font-family:'Fraunces',serif; font-size:clamp(1.6rem,3vw,2.2rem); font-weight:700; color:var(--dark); font-optical-sizing:auto; margin:0;">Onze keuzes</h2>
+            </div>
+            <p style="font-family:'Nunito',sans-serif; font-size:0.95rem; color:var(--muted); font-style:italic;">Onze aanbevolen plekken en parken volgen hier binnenkort.</p>
+        </div>
+    </section>
+)}
+
+<!-- PILLAR CONTENT: part 3 (H2 #3 onward) — no sidebar -->
+{part3 && (
+    <section style="background: var(--white); border-bottom: 1px solid var(--border); padding: 4.5rem 1.5rem 5rem;">
+        <article class="pillar-body" style="max-width: 760px; margin: 0 auto;" set:html={part3} />
     </section>
 )}
 
@@ -259,7 +297,7 @@ function excerpt(body: string, length = 115) {
 <script>
     const toc = document.getElementById('pillar-toc');
     if (toc) {
-        const headings = document.querySelectorAll('.pillar-body h2');
+        const headings = document.querySelectorAll('.pillar-body h2, #onze-keuzes');
         headings.forEach((h, i) => {
             const id = `section-${i}`;
             h.id = id;
