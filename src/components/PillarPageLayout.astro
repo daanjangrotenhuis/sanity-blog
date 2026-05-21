@@ -204,16 +204,6 @@ function excerpt(body: string, length = 115) {
                     <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--orange-dark); margin-bottom:1rem;">Navigatie</p>
                     <nav style="display:flex; flex-direction:column; gap:0.1rem;" id="pillar-toc"></nav>
                 </div>
-                {subcategories && subcategories.length > 0 && (
-                    <div style="margin-top:1.25rem; background:var(--primary-light); border:1.5px solid #A8E8E2; border-radius:14px; padding:1.5rem;">
-                        <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--primary-dark); margin-bottom:1rem;">Categorieën</p>
-                        <div style="display:flex; flex-direction:column; gap:0.35rem;">
-                            {subcategories.map(sub => (
-                                <a href={sub.href} style="font-family:'Nunito',sans-serif; font-size:0.875rem; font-weight:600; color:var(--primary-dark); text-decoration:none; padding:0.4rem 0.6rem; border-radius:8px; transition:background 0.15s;" onmouseover="this.style.background='rgba(0,180,166,0.12)'" onmouseout="this.style.background=''">{sub.title} →</a>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </aside>
         </div>
     </section>
