@@ -5,7 +5,9 @@ import post from './src/schemas/post'
 import pillarPage from './src/schemas/pillarPage'
 import park from './src/schemas/park'
 
-const previewOrigin = process.env.SANITY_STUDIO_PREVIEW_URL ?? 'http://localhost:4321'
+const previewOrigin = typeof window !== 'undefined'
+    ? window.location.origin
+    : 'https://www.vakantievoorkids.nl'
 
 export default defineConfig({
     projectId: '7oxpyma4',
