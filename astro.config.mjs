@@ -25,7 +25,10 @@ export default defineConfig({
           dataset: 'production',
           apiVersion: '2024-01-01',
           useCdn: true,
-          studioBasePath: '/admin'
+          studioBasePath: '/admin',
+          stega: {
+              studioUrl: '/admin',
+          },
       }), 
       react()
   ],

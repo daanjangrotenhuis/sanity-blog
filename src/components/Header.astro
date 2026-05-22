@@ -3,6 +3,26 @@ const currentPath = Astro.url.pathname;
 ---
 
 <style>
+    .site-header {
+        position: absolute;
+        left: 0; right: 0; top: 0;
+        z-index: 30;
+        background: transparent;
+    }
+
+    .header-inner {
+        padding: 0 2rem;
+        height: 66px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+    }
+
+    /* Left + right nav groups */
+    .header-left  { display: flex; align-items: center; gap: 0.25rem; }
+    .header-right { display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; }
+
+    /* Plain links */
     .header-nav-link {
         font-family: 'Nunito', sans-serif;
         font-size: 0.875rem;
@@ -16,9 +36,8 @@ const currentPath = Astro.url.pathname;
     .header-nav-link:hover { color: white; }
     .header-nav-link.active { background: var(--primary); color: white; }
 
-    .nav-dropdown-wrapper {
-        position: relative;
-    }
+    /* Dropdown trigger */
+    .nav-dropdown-wrapper { position: relative; }
     .nav-dropdown-trigger {
         font-family: 'Nunito', sans-serif;
         font-size: 0.875rem;
@@ -40,6 +59,7 @@ const currentPath = Astro.url.pathname;
     .nav-dropdown-trigger svg { width: 10px; height: 10px; transition: transform 0.2s; }
     .nav-dropdown-wrapper:hover .nav-dropdown-trigger svg { transform: rotate(180deg); }
 
+    /* Dropdown panel */
     .nav-dropdown {
         position: absolute;
         top: 100%;
@@ -77,7 +97,13 @@ const currentPath = Astro.url.pathname;
         white-space: nowrap;
     }
     .nav-dropdown-inner a:hover { background: rgba(255,255,255,0.08); color: white; }
+    .nav-dropdown-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.08);
+        margin: 0.35rem 0.75rem;
+    }
 
+    /* Mobile toggle */
     .menu-toggle {
         display: none;
         background: none;
@@ -95,12 +121,15 @@ const currentPath = Astro.url.pathname;
     }
     .menu-toggle.open { transform: rotate(180deg); }
 
+    /* Mobile nav */
     .mobile-nav {
         display: none;
         overflow: hidden;
         max-height: 0;
         transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border-top: 1px solid rgba(255,255,255,0.07);
+        background: rgba(13,40,48,0.25);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
     }
     .mobile-nav.open { max-height: 700px; }
     .mobile-nav-inner {
@@ -121,17 +150,40 @@ const currentPath = Astro.url.pathname;
     }
     .mobile-nav-link:hover { background: rgba(255,255,255,0.07); color: white; }
     .mobile-nav-link.active { color: var(--primary); }
-
-    .mobile-nav-section-label {
-        font-family: 'Nunito', sans-serif;
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: rgba(255,255,255,0.28);
-        padding: 0.7rem 0.6rem 0.2rem;
+    .mobile-nav-section {
         margin-top: 0.2rem;
     }
+    .mobile-nav-section-toggle {
+        font-family: 'Nunito', sans-serif;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.6);
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        padding: 0.45rem 0.6rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background 0.15s, color 0.15s;
+    }
+    .mobile-nav-section-toggle:hover { background: rgba(255,255,255,0.07); color: white; }
+    .mobile-nav-section-toggle svg {
+        width: 10px; height: 10px;
+        transition: transform 0.25s;
+        opacity: 0.5;
+        flex-shrink: 0;
+    }
+    .mobile-nav-section-toggle.open svg { transform: rotate(180deg); }
+    .mobile-nav-sub-list {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mobile-nav-sub-list.open { max-height: 400px; }
     .mobile-nav-sub {
         font-family: 'Nunito', sans-serif;
         font-size: 0.82rem;
@@ -146,33 +198,27 @@ const currentPath = Astro.url.pathname;
     .mobile-nav-sub:hover { background: rgba(255,255,255,0.07); color: white; }
 
     @media (max-width: 640px) {
-        .header-desktop-nav { display: none !important; }
+        .header-left { display: none !important; }
+        .header-nav-link { display: none !important; }
         .menu-toggle { display: flex !important; }
         .mobile-nav { display: block !important; }
-        .header-inner { padding: 0 1.25rem !important; }
+        .header-inner {
+            grid-template-columns: 1fr auto !important;
+            padding: 0 1.25rem !important;
+        }
         .header-logo span { font-size: 1rem !important; }
     }
 </style>
 
-<header style="background: var(--dark);">
-    <div class="header-inner" style="max-width: 1160px; margin: 0 auto; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 66px;">
+<header class="site-header">
+    <div class="header-inner">
 
-        <a href="/" class="header-logo" style="text-decoration: none; display: flex; align-items: baseline; gap: 0; flex-shrink: 0;">
-            <span style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 700; color: white; font-optical-sizing: auto;">Vakantie</span>
-            <span style="font-family: 'Fraunces', serif; font-size: 1.2rem; font-weight: 300; font-style: italic; color: var(--yellow); font-optical-sizing: auto;">&nbsp;voor Kids</span>
-        </a>
-
-        <nav class="header-desktop-nav" style="display: flex; align-items: center; gap: 0.25rem;">
-            <a href="/" class={`header-nav-link${currentPath === '/' ? ' active' : ''}`}>Home</a>
-            <a href="/blog" class={`header-nav-link${currentPath.startsWith('/blog') ? ' active' : ''}`}>Blogs</a>
-            <a href="/vakantie-met-kids" class={`header-nav-link${currentPath === '/vakantie-met-kids' ? ' active' : ''}`}>Vakantie met kids</a>
-
+        <!-- Left nav -->
+        <div class="header-left">
             <div class="nav-dropdown-wrapper">
                 <a href="/bestemmingen" class={`nav-dropdown-trigger${currentPath.startsWith('/bestemmingen') ? ' active' : ''}`}>
                     Bestemmingen
-                    <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <div class="nav-dropdown">
                     <div class="nav-dropdown-inner">
@@ -187,9 +233,7 @@ const currentPath = Astro.url.pathname;
             <div class="nav-dropdown-wrapper">
                 <a href="/overnachten" class={`nav-dropdown-trigger${currentPath.startsWith('/overnachten') ? ' active' : ''}`}>
                     Overnachten
-                    <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <div class="nav-dropdown">
                     <div class="nav-dropdown-inner">
@@ -197,6 +241,8 @@ const currentPath = Astro.url.pathname;
                         <a href="/overnachten/midweek-weg-met-kids">Midweek weg met kids</a>
                         <a href="/overnachten/weekend-weg-met-kids">Weekend weg met kids</a>
                         <a href="/overnachten/campings-voor-kids">Campings voor kids</a>
+                        <div class="nav-dropdown-divider"></div>
+                        <a href="/overnachten/ontdekken" style="color:var(--yellow) !important;">🗺️ Ontdek parken op de kaart</a>
                     </div>
                 </div>
             </div>
@@ -204,9 +250,7 @@ const currentPath = Astro.url.pathname;
             <div class="nav-dropdown-wrapper">
                 <a href="/uitjes" class={`nav-dropdown-trigger${currentPath.startsWith('/uitjes') ? ' active' : ''}`}>
                     Uitjes
-                    <svg viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </a>
                 <div class="nav-dropdown">
                     <div class="nav-dropdown-inner">
@@ -217,43 +261,75 @@ const currentPath = Astro.url.pathname;
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Centered logo -->
+        <a href="/" class="header-logo" style="text-decoration:none; display:flex; align-items:baseline; gap:0;">
+            <span style="font-family:'Fraunces',serif; font-size:1.2rem; font-weight:700; color:white; font-optical-sizing:auto; letter-spacing:-0.01em;">Vakantie</span>
+            <span style="font-family:'Fraunces',serif; font-size:1.2rem; font-weight:300; font-style:italic; color:var(--yellow); font-optical-sizing:auto;">&nbsp;voor Kids</span>
+        </a>
+
+        <!-- Right nav -->
+        <div class="header-right">
+            <a href="/vakantie-met-kids" class={`header-nav-link${currentPath === '/vakantie-met-kids' ? ' active' : ''}`}>Vakantie met kids</a>
+            <a href="/blog" class={`header-nav-link${currentPath.startsWith('/blog') ? ' active' : ''}`}>Blogs</a>
             <a href="/about" class={`header-nav-link${currentPath === '/about' ? ' active' : ''}`}>Over ons</a>
-        </nav>
-
-        <button class="menu-toggle" id="menuToggle" aria-label="Menu openen">
-            <i id="menuIcon" style="font-style:normal;">+</i>
-        </button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Menu openen">
+                <i id="menuIcon" style="font-style:normal;">+</i>
+            </button>
+        </div>
     </div>
 
+    <!-- Mobile nav -->
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-inner">
-            <a href="/" class={`mobile-nav-link${currentPath === '/' ? ' active' : ''}`}>Home</a>
             <a href="/blog" class={`mobile-nav-link${currentPath.startsWith('/blog') ? ' active' : ''}`}>Blogs</a>
             <a href="/vakantie-met-kids" class={`mobile-nav-link${currentPath === '/vakantie-met-kids' ? ' active' : ''}`}>Vakantie met kids</a>
 
-            <div class="mobile-nav-section-label">Bestemmingen</div>
-            <a href="/bestemmingen" class={`mobile-nav-link${currentPath === '/bestemmingen' ? ' active' : ''}`} style="padding-left: 0.6rem;">Alle bestemmingen</a>
-            <a href="/bestemmingen/vakantie-nederland-met-kids" class="mobile-nav-sub">Nederland met kids</a>
-            <a href="/bestemmingen/vakantie-belgie-met-kids" class="mobile-nav-sub">België met kids</a>
-            <a href="/bestemmingen/vakantie-duitsland-met-kids" class="mobile-nav-sub">Duitsland met kids</a>
-            <a href="/bestemmingen/vakantie-oostenrijk-met-kids" class="mobile-nav-sub">Oostenrijk met kids</a>
+            <div class="mobile-nav-section">
+                <button class="mobile-nav-section-toggle" data-target="mob-bestemmingen">
+                    Bestemmingen
+                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="mobile-nav-sub-list" id="mob-bestemmingen">
+                    <a href="/bestemmingen" class="mobile-nav-sub">Alle bestemmingen</a>
+                    <a href="/bestemmingen/vakantie-nederland-met-kids" class="mobile-nav-sub">Nederland met kids</a>
+                    <a href="/bestemmingen/vakantie-belgie-met-kids" class="mobile-nav-sub">België met kids</a>
+                    <a href="/bestemmingen/vakantie-duitsland-met-kids" class="mobile-nav-sub">Duitsland met kids</a>
+                    <a href="/bestemmingen/vakantie-oostenrijk-met-kids" class="mobile-nav-sub">Oostenrijk met kids</a>
+                </div>
+            </div>
 
-            <div class="mobile-nav-section-label">Overnachten</div>
-            <a href="/overnachten" class={`mobile-nav-link${currentPath === '/overnachten' ? ' active' : ''}`} style="padding-left: 0.6rem;">Alle overnachtingen</a>
-            <a href="/overnachten/vakantiepark-voor-kids" class="mobile-nav-sub">Vakantiepark voor kids</a>
-            <a href="/overnachten/midweek-weg-met-kids" class="mobile-nav-sub">Midweek weg met kids</a>
-            <a href="/overnachten/weekend-weg-met-kids" class="mobile-nav-sub">Weekend weg met kids</a>
-            <a href="/overnachten/campings-voor-kids" class="mobile-nav-sub">Campings voor kids</a>
+            <div class="mobile-nav-section">
+                <button class="mobile-nav-section-toggle" data-target="mob-overnachten">
+                    Overnachten
+                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="mobile-nav-sub-list" id="mob-overnachten">
+                    <a href="/overnachten" class="mobile-nav-sub">Alle overnachtingen</a>
+                    <a href="/overnachten/vakantiepark-voor-kids" class="mobile-nav-sub">Vakantiepark voor kids</a>
+                    <a href="/overnachten/midweek-weg-met-kids" class="mobile-nav-sub">Midweek weg met kids</a>
+                    <a href="/overnachten/weekend-weg-met-kids" class="mobile-nav-sub">Weekend weg met kids</a>
+                    <a href="/overnachten/campings-voor-kids" class="mobile-nav-sub">Campings voor kids</a>
+                    <a href="/overnachten/ontdekken" class="mobile-nav-sub" style="color:var(--yellow);">🗺️ Ontdek parken op de kaart</a>
+                </div>
+            </div>
 
-            <div class="mobile-nav-section-label">Uitjes</div>
-            <a href="/uitjes" class={`mobile-nav-link${currentPath === '/uitjes' ? ' active' : ''}`} style="padding-left: 0.6rem;">Alle uitjes</a>
-            <a href="/uitjes/kindvriendelijke-restaurants" class="mobile-nav-sub">Kindvriendelijke restaurants</a>
-            <a href="/uitjes/kindvriendelijk-musea" class="mobile-nav-sub">Kindvriendelijk musea</a>
-            <a href="/uitjes/binnenspeeltijd" class="mobile-nav-sub">Binnenspeeltijd</a>
-            <a href="/uitjes/zwemparadijs" class="mobile-nav-sub">Zwemparadijs</a>
+            <div class="mobile-nav-section">
+                <button class="mobile-nav-section-toggle" data-target="mob-uitjes">
+                    Uitjes
+                    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="mobile-nav-sub-list" id="mob-uitjes">
+                    <a href="/uitjes" class="mobile-nav-sub">Alle uitjes</a>
+                    <a href="/uitjes/kindvriendelijke-restaurants" class="mobile-nav-sub">Kindvriendelijke restaurants</a>
+                    <a href="/uitjes/kindvriendelijk-musea" class="mobile-nav-sub">Kindvriendelijk musea</a>
+                    <a href="/uitjes/binnenspeeltijd" class="mobile-nav-sub">Binnenspeeltijd</a>
+                    <a href="/uitjes/zwemparadijs" class="mobile-nav-sub">Zwemparadijs</a>
+                </div>
+            </div>
 
-            <a href="/about" class={`mobile-nav-link${currentPath === '/about' ? ' active' : ''}`} style="margin-top: 0.4rem;">Over ons</a>
+            <a href="/about" class={`mobile-nav-link${currentPath === '/about' ? ' active' : ''}`} style="margin-top:0.4rem;">Over ons</a>
         </div>
     </div>
 </header>
@@ -262,11 +338,19 @@ const currentPath = Astro.url.pathname;
     const toggle = document.getElementById('menuToggle');
     const nav    = document.getElementById('mobileNav');
     const icon   = document.getElementById('menuIcon');
-
     toggle?.addEventListener('click', () => {
         const isOpen = nav?.classList.toggle('open');
         toggle.classList.toggle('open', isOpen);
         if (icon) icon.textContent = isOpen ? '−' : '+';
         toggle.setAttribute('aria-label', isOpen ? 'Menu sluiten' : 'Menu openen');
+    });
+
+    document.querySelectorAll('.mobile-nav-section-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetId = btn.getAttribute('data-target');
+            const list = document.getElementById(targetId!);
+            const isOpen = list?.classList.toggle('open');
+            btn.classList.toggle('open', isOpen);
+        });
     });
 </script>

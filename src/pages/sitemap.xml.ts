@@ -22,15 +22,19 @@ const staticPages = [
     { url: `${SITE}/uitjes/kindvriendelijk-musea`, priority: '0.8', changefreq: 'weekly' },
     { url: `${SITE}/uitjes/binnenspeeltijd`, priority: '0.8', changefreq: 'weekly' },
     { url: `${SITE}/uitjes/zwemparadijs`, priority: '0.8', changefreq: 'weekly' },
+    { url: `${SITE}/overnachten/ontdekken`, priority: '0.85', changefreq: 'weekly' },
     { url: `${SITE}/about`, priority: '0.6', changefreq: 'monthly' },
 ];
 
 export const GET: APIRoute = async () => {
-    const posts = await sanityClient.fetch<{ slug: { current: string }; publishedAt: string }[]>(`
-        *[_type == "post"] | order(publishedAt desc) {
-            slug, publishedAt
-        }
-    `);
+    const [posts, parks] = await Promise.all([
+        sanityClient.fetch<{ slug: { current: string }; publishedAt: string }[]>(`
+            *[_type == "post"] | order(publishedAt desc) { slug, publishedAt }
+        `),
+        sanityClient.fetch<{ slug: { current: string }; _updatedAt: string }[]>(`
+            *[_type == "park"] | order(name asc) { slug, _updatedAt }
+        `),
+    ]);
 
     const postEntries = posts.map(post => ({
         url: `${SITE}/blog/${post.slug.current}`,
@@ -39,7 +43,14 @@ export const GET: APIRoute = async () => {
         changefreq: 'weekly',
     }));
 
-    const allEntries = [...staticPages, ...postEntries];
+    const parkEntries = parks.map(park => ({
+        url: `${SITE}/overnachten/ontdekken/${park.slug.current}`,
+        lastmod: park._updatedAt ? park._updatedAt.slice(0, 10) : undefined,
+        priority: '0.75',
+        changefreq: 'weekly',
+    }));
+
+    const allEntries = [...staticPages, ...postEntries, ...parkEntries];
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

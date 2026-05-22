@@ -1,0 +1,430 @@
+---
+import BaseHead from '../../../components/BaseHead.astro';
+import Header from '../../../components/Header.astro';
+import Footer from '../../../components/Footer.astro';
+import { SITE_TITLE } from '../../../consts';
+import { sanityClient } from 'sanity:client';
+
+const parks = await sanityClient.fetch(`
+    *[_type == "park"] | order(featured desc, name asc) {
+        name, slug, type, tagline, heroImageUrl, facilities,
+        location, priceFrom, featured, discount
+    }
+`);
+
+const FACILITY_LABELS: Record<string, string> = {
+    'zwembad': '🏊 Zwembad',
+    'subtropisch-zwembad': '🌴 Subtropisch zwembad',
+    'speeltuin': '🎡 Speeltuin',
+    'hondenvriendelijk': '🐕 Honden welkom',
+    'nabij-attractiepark': '🎢 Nabij attractiepark',
+    'restaurant': '🍴 Restaurant',
+    'animatie': '🎯 Animatie',
+    'kinderanimatie': '🎭 Kinderanimatie',
+    'wifi': '📶 Wifi',
+    'sport-spel': '⚽ Sport & spel',
+    'sauna-wellness': '🧖 Sauna & wellness',
+    'fietsverhuur': '🚲 Fietsverhuur',
+    'strand-meer': '🏖️ Strand/meer nabij',
+    'klimpark': '🌲 Klimpark',
+    'supermarkt': '🛒 Supermarkt nabij',
+    'rolstoeltoegankelijk': '♿ Rolstoeltoegankelijk',
+};
+
+// Collect all unique facilities used across parks for the filter bar
+const usedFacilities = [...new Set(parks.flatMap((p: any) => p.facilities ?? []))];
+
+const parksForMap = parks.map((p: any) => ({
+    slug: p.slug?.current,
+    name: p.name,
+    type: p.type,
+    lat: p.location?.lat,
+    lng: p.location?.lng,
+    city: p.location?.city,
+    province: p.location?.province,
+    country: p.location?.country,
+}));
+---
+
+<!doctype html>
+<html lang="nl">
+<head>
+    <BaseHead
+        title={`Ontdek parken & accommodaties — ${SITE_TITLE}`}
+        description="Bekijk alle vakantieparken, campings en accommodaties op de kaart. Filter op faciliteiten en vind de perfecte plek voor jouw gezin."
+    />
+</head>
+<body style="background: var(--cream);">
+    <Header />
+
+    <!-- HERO -->
+    <div style="background: var(--dark); padding: 6.5rem 1.5rem 5rem; position: relative; overflow: hidden;">
+        <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 60% 0%, rgba(0,180,166,0.15) 0%, transparent 60%);"></div>
+        <div style="max-width: 1160px; margin: 0 auto; position: relative;">
+            <p style="font-family:'Nunito',sans-serif; font-size:0.68rem; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--yellow); margin-bottom:0.75rem;">Overnachten</p>
+            <h1 style="font-family:'Fraunces',serif; font-size:clamp(2rem,5vw,3rem); font-weight:700; color:white; line-height:1.15; margin-bottom:1rem; font-optical-sizing:auto; max-width:640px;">Ontdek parken &amp; accommodaties</h1>
+            <p style="font-family:'Nunito',sans-serif; font-size:1.05rem; color:rgba(255,255,255,0.6); max-width:540px; line-height:1.75; margin:0;">
+                Vind de perfecte verblijfplaats voor jouw gezin. Bekijk alle locaties op de kaart, filter op faciliteiten en klik door voor alle details.
+            </p>
+            {parks.length > 0 && (
+                <div style="margin-top:1.5rem; display:inline-flex; align-items:center; gap:0.6rem; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:30px; padding:0.5rem 1.1rem;">
+                    <span style="font-family:'Nunito',sans-serif; font-size:0.875rem; font-weight:700; color:var(--primary);">{parks.length}</span>
+                    <span style="font-family:'Nunito',sans-serif; font-size:0.875rem; color:rgba(255,255,255,0.55);">locaties beschikbaar</span>
+                </div>
+            )}
+        </div>
+        <div style="position:absolute; bottom:-2px; left:0; right:0; line-height:0;">
+            <svg viewBox="0 0 1440 50" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block; width:100%; height:50px;">
+                <path d="M0,20 C480,50 960,0 1440,30 L1440,50 L0,50 Z" fill="#F7FDFC"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- FILTER + RESULTS -->
+    <div style="max-width:1160px; margin:0 auto; padding:2.5rem 1.5rem 5rem;">
+
+        <!-- Search -->
+        <div style="margin-bottom:1.5rem;">
+            <div style="position:relative; max-width:480px;">
+                <span style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:var(--muted-light); font-size:1rem; pointer-events:none;">🔍</span>
+                <input
+                    id="park-search"
+                    type="search"
+                    placeholder="Zoek op naam, stad, provincie of land…"
+                    style="width:100%; font-family:'Nunito',sans-serif; font-size:0.9rem; padding:0.7rem 1rem 0.7rem 2.6rem; border:1.5px solid var(--border); border-radius:30px; background:white; color:var(--dark); outline:none; box-sizing:border-box;"
+                    onfocus="this.style.borderColor='var(--primary)'"
+                    onblur="this.style.borderColor='var(--border)'"
+                />
+            </div>
+        </div>
+
+        <!-- Filter chips -->
+        {usedFacilities.length > 0 && (
+            <div style="margin-bottom:2rem;">
+                <p style="font-family:'Nunito',sans-serif; font-size:0.72rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted-light); margin-bottom:0.75rem;">Filter op faciliteit</p>
+                <div id="filter-chips" style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                    {usedFacilities.map((f: string) => (
+                        <button
+                            data-facility={f}
+                            class="filter-chip"
+                            style="font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:600; background:white; color:var(--muted); border:1.5px solid var(--border); border-radius:30px; padding:0.4rem 1rem; cursor:pointer; transition:all 0.15s; white-space:nowrap;"
+                        >
+                            {FACILITY_LABELS[f] ?? f}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        <!-- Map -->
+        <div style="border-radius:16px; overflow:hidden; border:1.5px solid var(--border); box-shadow:0 4px 24px rgba(13,40,48,0.08); margin-bottom:2.5rem;">
+            <div id="park-map" style="height:460px; width:100%;"></div>
+        </div>
+
+        <!-- Results count -->
+        <div style="margin-bottom:1.25rem; display:flex; align-items:center; gap:0.75rem;">
+            <p id="results-count" style="font-family:'Nunito',sans-serif; font-size:0.875rem; color:var(--muted);"></p>
+            <button id="clear-filters" style="display:none; font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:700; color:var(--primary); background:none; border:none; cursor:pointer; padding:0; text-decoration:underline;">Wis filters</button>
+        </div>
+
+        <!-- Park cards -->
+        {parks.length === 0 ? (
+            <div style="text-align:center; padding:5rem 1rem;">
+                <p style="font-family:'Fraunces',serif; font-size:1.5rem; color:var(--dark); font-optical-sizing:auto;">Binnenkort hier te zien</p>
+                <p style="font-family:'Nunito',sans-serif; font-size:0.95rem; color:var(--muted); margin-top:0.5rem;">We voegen de eerste locaties snel toe.</p>
+            </div>
+        ) : (
+            <div id="parks-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem;">
+                {parks.map((park: any, i: number) => (
+                    <a
+                        href={`/overnachten/ontdekken/${park.slug?.current}`}
+                        class="park-card"
+                        data-slug={park.slug?.current}
+                        data-facilities={JSON.stringify(park.facilities ?? [])}
+                        data-lat={park.location?.lat ?? ''}
+                        data-lng={park.location?.lng ?? ''}
+                        style="display:block; background:white; border:1.5px solid var(--border); border-radius:16px; overflow:hidden; text-decoration:none; box-shadow:0 2px 8px rgba(13,40,48,0.05); transition:transform 0.22s ease, box-shadow 0.22s ease;"
+                        onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 16px 40px rgba(13,40,48,0.12)'"
+                        onmouseout="this.style.transform=''; this.style.boxShadow='0 2px 8px rgba(13,40,48,0.05)'"
+                    >
+                        <!-- Image -->
+                        <div style={`height:200px; background:var(--primary-light); position:relative; ${park.heroImageUrl ? `background-image:url('${park.heroImageUrl}'); background-size:cover; background-position:center;` : ''}`}>
+                            {park.featured && (
+                                <span style="position:absolute; top:0.75rem; left:0.75rem; font-family:'Nunito',sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; background:var(--orange); color:var(--dark); padding:0.3rem 0.7rem; border-radius:20px;">⭐ Uitgelicht</span>
+                            )}
+                            {park.type && (
+                                <span style="position:absolute; bottom:0.75rem; right:0.75rem; font-family:'Nunito',sans-serif; font-size:0.72rem; font-weight:700; background:rgba(13,40,48,0.75); color:white; padding:0.3rem 0.7rem; border-radius:20px; backdrop-filter:blur(4px);">
+                                    {park.type.charAt(0).toUpperCase() + park.type.slice(1)}
+                                </span>
+                            )}
+                        </div>
+
+                        <!-- Content -->
+                        <div style="padding:1.25rem 1.4rem 1.5rem;">
+                            {park.location?.city && (
+                                <p style="font-family:'Nunito',sans-serif; font-size:0.72rem; color:var(--muted-light); margin-bottom:0.3rem;">📍 {park.location.city}{park.location.province ? `, ${park.location.province}` : ''}</p>
+                            )}
+                            <h3 style="font-family:'Fraunces',serif; font-size:1.1rem; font-weight:700; color:var(--dark); line-height:1.25; margin-bottom:0.4rem; font-optical-sizing:auto;">{park.name}</h3>
+                            {park.tagline && (
+                                <p style="font-family:'Nunito',sans-serif; font-size:0.875rem; color:var(--muted); line-height:1.55; margin-bottom:0.75rem;">{park.tagline}</p>
+                            )}
+
+                            <!-- Facility chips -->
+                            {park.facilities?.length > 0 && (
+                                <div style="display:flex; flex-wrap:wrap; gap:0.35rem; margin-bottom:0.85rem;">
+                                    {(park.facilities as string[]).slice(0, 4).map((f: string) => (
+                                        <span style="font-family:'Nunito',sans-serif; font-size:0.72rem; font-weight:600; background:var(--primary-light); color:var(--primary-dark); padding:0.25rem 0.6rem; border-radius:20px;">
+                                            {FACILITY_LABELS[f] ?? f}
+                                        </span>
+                                    ))}
+                                    {park.facilities.length > 4 && (
+                                        <span style="font-family:'Nunito',sans-serif; font-size:0.72rem; color:var(--muted-light);">+{park.facilities.length - 4} meer</span>
+                                    )}
+                                </div>
+                            )}
+
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                {park.priceFrom ? (
+                                    <p style="font-family:'Nunito',sans-serif; font-size:0.82rem; color:var(--muted);">Vanaf <strong style="color:var(--dark);">€{park.priceFrom}</strong>/nacht</p>
+                                ) : <span></span>}
+                                <span style="font-family:'Nunito',sans-serif; font-size:0.82rem; font-weight:700; color:var(--primary);">Bekijk →</span>
+                            </div>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        )}
+    </div>
+
+    <Footer />
+
+    <!-- Parks data for the map -->
+    <script type="application/json" id="parks-map-data" set:html={JSON.stringify(parksForMap)}></script>
+
+    <script>
+        import L from 'leaflet';
+        import 'leaflet/dist/leaflet.css';
+        import 'leaflet.markercluster';
+        import 'leaflet.markercluster/dist/MarkerCluster.css';
+        import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+
+        const parks = JSON.parse(document.getElementById('parks-map-data')?.textContent ?? '[]');
+
+        const map = L.map('park-map').setView([52.2, 5.3], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18,
+        }).addTo(map);
+
+        const pinIcon = L.divIcon({
+            className: '',
+            html: `<svg width="20" height="28" viewBox="0 0 20 28" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 0C4.48 0 0 4.48 0 10c0 7.5 10 18 10 18s10-10.5 10-18C20 4.48 15.52 0 10 0z" fill="#E53E3E"/>
+                <circle cx="10" cy="10" r="4" fill="white"/>
+            </svg>`,
+            iconSize: [20, 28],
+            iconAnchor: [10, 28],
+            popupAnchor: [0, -30],
+        });
+
+        // Cluster group — pins merge when zoomed out, split when zoomed in
+        const cluster = (L as any).markerClusterGroup({
+            maxClusterRadius: 50,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            iconCreateFunction: (c: any) => L.divIcon({
+                className: '',
+                html: `<div style="width:36px;height:36px;background:#E53E3E;color:white;border:3px solid white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:sans-serif;font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.25);">${c.getChildCount()}</div>`,
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+            }),
+        });
+
+        const markerMap: Record<string, L.Marker> = {};
+        parks.forEach(function(p: any) {
+            if (p.lat && p.lng) {
+                const m = L.marker([p.lat, p.lng], { icon: pinIcon });
+                m.bindPopup(
+                    '<div style="font-family:sans-serif; min-width:150px; padding:2px 0;">' +
+                    '<strong style="font-size:0.875rem;color:#0D2830;">' + p.name + '</strong>' +
+                    (p.city ? '<br><span style="font-size:0.75rem;color:#888;margin-top:2px;display:block;">📍 ' + p.city + '</span>' : '') +
+                    '<br><a href="/overnachten/ontdekken/' + p.slug + '" style="font-size:0.8rem;color:#E53E3E;font-weight:700;text-decoration:none;display:inline-block;margin-top:6px;">Bekijk →</a>' +
+                    '</div>'
+                );
+                cluster.addLayer(m);
+                markerMap[p.slug] = m;
+            }
+        });
+
+        map.addLayer(cluster);
+
+        // ── Filters + proximity search ──────────────────────────────────────
+        const chips = document.querySelectorAll('.filter-chip');
+        const cards = document.querySelectorAll('.park-card');
+        const countEl = document.getElementById('results-count');
+        const clearBtn = document.getElementById('clear-filters');
+        const searchInput = document.getElementById('park-search') as HTMLInputElement;
+
+        let activeFilters = new Set<string>();
+        let searchGeo: { lat: number; lng: number; bbox: { s:number; n:number; w:number; e:number } | null; radius: number } | null = null;
+        let searchMarker: L.Marker | null = null;
+        let searchTimeout: ReturnType<typeof setTimeout>;
+
+        // Haversine distance in km
+        function distance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+            const R = 6371, r = Math.PI / 180;
+            const dLat = (lat2 - lat1) * r, dLng = (lng2 - lng1) * r;
+            const a = Math.sin(dLat/2)**2 + Math.cos(lat1*r) * Math.cos(lat2*r) * Math.sin(dLng/2)**2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function updateCount(visible: number) {
+            if (countEl) countEl.textContent = visible + ' van ' + cards.length + ' locaties';
+        }
+
+        function applyFilters() {
+            let visible = 0;
+            cluster.clearLayers();
+            cards.forEach(function(card: any) {
+                const facilities: string[] = JSON.parse(card.dataset.facilities || '[]');
+                const slug: string = card.dataset.slug;
+                const lat: number = parseFloat(card.dataset.lat);
+                const lng: number = parseFloat(card.dataset.lng);
+
+                const matchesFacilities = activeFilters.size === 0 ||
+                    [...activeFilters].every(f => facilities.includes(f));
+
+                let matchesSearch = true;
+                if (searchGeo) {
+                    if (!lat || !lng) {
+                        matchesSearch = false;
+                    } else if (searchGeo.bbox) {
+                        // country / region — use bounding box
+                        const { s, n, w, e } = searchGeo.bbox;
+                        matchesSearch = lat >= s && lat <= n && lng >= w && lng <= e;
+                    } else {
+                        // city / point — use radius
+                        matchesSearch = distance(searchGeo.lat, searchGeo.lng, lat, lng) <= searchGeo.radius;
+                    }
+                }
+
+                const show = matchesFacilities && matchesSearch;
+                card.style.display = show ? '' : 'none';
+                if (show) {
+                    visible++;
+                    if (markerMap[slug]) cluster.addLayer(markerMap[slug]);
+                }
+            });
+            updateCount(visible);
+            if (clearBtn) clearBtn.style.display = (activeFilters.size > 0 || searchGeo) ? 'inline' : 'none';
+        }
+
+        // Geocode search term via Nominatim
+        async function doSearch(q: string) {
+            if (!q) {
+                searchGeo = null;
+                if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
+                applyFilters();
+                return;
+            }
+            try {
+                const res = await fetch(
+                    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`,
+                    { headers: { 'User-Agent': 'VakantieVoorKids/1.0' } }
+                );
+                const data = await res.json();
+                if (!data.length) return;
+
+                const hit = data[0];
+                const lat = parseFloat(hit.lat);
+                const lng = parseFloat(hit.lon);
+                const [s, n, w, e] = (hit.boundingbox as string[]).map(Number);
+                const bboxArea = (n - s) * (e - w);
+
+                // Large bounding box → country/region → use bbox; small → city → use radius
+                const useBbox = bboxArea > 2;
+                searchGeo = {
+                    lat, lng,
+                    bbox: useBbox ? { s, n, w, e } : null,
+                    radius: 40,
+                };
+
+                // Subtle pulsing search pin
+                if (searchMarker) map.removeLayer(searchMarker);
+                const searchIcon = L.divIcon({
+                    className: '',
+                    html: `<div style="width:14px;height:14px;background:#555;border:2px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(85,85,85,0.15);"></div>`,
+                    iconSize: [14, 14],
+                    iconAnchor: [7, 7],
+                });
+                searchMarker = L.marker([lat, lng], { icon: searchIcon, zIndexOffset: -100 }).addTo(map);
+                searchMarker.bindPopup(`<span style="font-family:sans-serif;font-size:0.8rem;">📍 ${hit.display_name.split(',').slice(0,2).join(',')}</span>`);
+
+                if (useBbox) {
+                    map.fitBounds([[s, w], [n, e]], { padding: [30, 30], maxZoom: 10 });
+                } else {
+                    map.setView([lat, lng], 9);
+                }
+
+                applyFilters();
+            } catch (e) {
+                // silently fail — leave current filter state
+            }
+        }
+
+        // Chip clicks
+        chips.forEach(function(chip: any) {
+            chip.addEventListener('click', function() {
+                const f: string = chip.dataset.facility;
+                if (activeFilters.has(f)) {
+                    activeFilters.delete(f);
+                    chip.style.background = 'white';
+                    chip.style.color = 'var(--muted)';
+                    chip.style.borderColor = 'var(--border)';
+                } else {
+                    activeFilters.add(f);
+                    chip.style.background = 'var(--primary)';
+                    chip.style.color = 'white';
+                    chip.style.borderColor = 'var(--primary)';
+                }
+                applyFilters();
+            });
+        });
+
+        // Debounced search input
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => doSearch(searchInput.value.trim()), 450);
+            });
+        }
+
+        // Clear everything
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                activeFilters.clear();
+                searchGeo = null;
+                if (searchInput) searchInput.value = '';
+                if (searchMarker) { map.removeLayer(searchMarker); searchMarker = null; }
+                chips.forEach(function(chip: any) {
+                    chip.style.background = 'white';
+                    chip.style.color = 'var(--muted)';
+                    chip.style.borderColor = 'var(--border)';
+                });
+                applyFilters();
+            });
+        }
+
+        updateCount(cards.length);
+    </script>
+
+    <style>
+        @media (max-width: 768px) {
+            #parks-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #parks-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
+    </style>
+</body>
+</html>

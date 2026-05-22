@@ -1,0 +1,43 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PillarPageLayout from '../../components/PillarPageLayout.astro';
+import { SITE_TITLE } from '../../consts';
+import { findSubcategory } from '../../data/categories';
+import { sanityClient } from 'sanity:client';
+
+const { slug } = Astro.params;
+const category = findSubcategory('bestemmingen', slug!);
+if (!category) return Astro.redirect('/bestemmingen');
+
+const [pillar, posts] = await Promise.all([
+    sanityClient.fetch(`*[_type == "pillarPage" && slug.current == $slug][0]{ title, label, intro, heroImageUrl, contentHtml, metaDescription }`, { slug }),
+    sanityClient.fetch(`*[_type == "post" && $cat in categories] | order(publishedAt desc) { title, slug, publishedAt, body, imageUrl }`, { cat: category.sanityValue }),
+]);
+
+const title = pillar?.title ?? category.title;
+const label = pillar?.label ?? 'Bestemmingen';
+const intro = pillar?.intro ?? category.intro;
+const metaDescription = pillar?.metaDescription ?? intro;
+---
+
+<!doctype html>
+<html lang="nl">
+<head>
+    <BaseHead title={`${title} — ${SITE_TITLE}`} description={metaDescription} />
+</head>
+<body style="background: var(--cream);">
+    <Header />
+    <PillarPageLayout
+        title={title}
+        label={label}
+        intro={intro}
+        heroImageUrl={pillar?.heroImageUrl}
+        pillarContent={pillar?.contentHtml}
+        posts={posts}
+        breadcrumb={{ label: 'Bestemmingen', href: '/bestemmingen' }}
+    />
+    <Footer />
+</body>
+</html>
