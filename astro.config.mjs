@@ -21,7 +21,7 @@ export default defineConfig({
       mdx(), 
       sitemap(), 
       sanity({
-          projectId: '7oxpyma4',
+          projectId: 'sg6a2naq',
           dataset: 'production',
           apiVersion: '2024-01-01',
           useCdn: true,

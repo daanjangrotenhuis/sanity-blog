@@ -13,7 +13,7 @@ const previewOrigin = typeof window !== 'undefined'
 const PREVIEW_TYPES = ['post', 'pillarPage', 'park']
 
 export default defineConfig({
-    projectId: '7oxpyma4',
+    projectId: 'sg6a2naq',
     dataset: 'production',
     plugins: [
         structureTool({
